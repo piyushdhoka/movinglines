@@ -1,0 +1,95 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --gradient-start: #a21caf;
+  --gradient-mid: #6366f1;
+  --gradient-end: #06b6d4;
+}
+
+body {
+  background: linear-gradient(135deg, #0f172a 0%, #020617 50%, #0f172a 100%);
+  min-height: 100vh;
+}
+
+.gradient-text {
+  background: linear-gradient(135deg, var(--gradient-start), var(--gradient-mid), var(--gradient-end));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.gradient-border {
+  position: relative;
+  background: linear-gradient(135deg, #1e293b, #0f172a);
+  border-radius: 1rem;
+}
+
+.gradient-border::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  padding: 1px;
+  border-radius: 1rem;
+  background: linear-gradient(135deg, var(--gradient-start), var(--gradient-mid), var(--gradient-end));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+.glass {
+  background: rgba(15, 23, 42, 0.8);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(148, 163, 184, 0.1);
+}
+
+.btn-primary {
+  @apply relative px-6 py-3 rounded-xl font-medium transition-all duration-300;
+  background: linear-gradient(135deg, var(--gradient-start), var(--gradient-mid));
+  box-shadow: 0 4px 20px rgba(162, 28, 175, 0.3);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(162, 28, 175, 0.4);
+}
+
+.btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.input-field {
+  @apply w-full px-4 py-3 rounded-xl bg-dark-900/50 border border-dark-700/50 
+         focus:border-primary-500/50 focus:ring-2 focus:ring-primary-500/20 
+         outline-none transition-all duration-300 placeholder:text-dark-500;
+}
+
+.card {
+  @apply gradient-border p-6 rounded-2xl;
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.loading-shimmer {
+  background: linear-gradient(90deg, #1e293b 0%, #334155 50%, #1e293b 100%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+.video-card {
+  @apply relative overflow-hidden rounded-2xl bg-dark-900/50 border border-dark-700/30
+         transition-all duration-500 hover:border-primary-500/30 hover:shadow-xl
+         hover:shadow-primary-500/10;
+}
+
+.video-card:hover .video-overlay {
+  opacity: 1;
+}
+
