@@ -180,12 +180,40 @@ GOOGLE_API_KEY=your_key_here
 4. Copy `Project URL` and `Anon Key`
 5. Copy `Service Role Key` for backend
 
+**For backend `.env`:**
 ```env
 SUPABASE_URL=https://xxx.supabase.co
 SUPABASE_KEY=your_service_role_key
 SUPABASE_ANON_KEY=your_anon_key
 SUPABASE_BUCKET=manim-videos
 ```
+
+**For frontend `.env.local`:**
+```env
+NEXT_PUBLIC_SUPABASE_URL=https://xxx.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
+
+# Database connection string for Drizzle ORM
+# Get this from: Supabase Dashboard → Settings → Database → Connection string (URI)
+DATABASE_URL=postgresql://postgres:[YOUR-PASSWORD]@db.[YOUR-PROJECT-REF].supabase.co:5432/postgres
+```
+
+#### Setting up Supabase Database with Drizzle ORM
+
+After adding your DATABASE_URL, run the migrations to create all necessary tables:
+
+```bash
+cd frontend
+bun run lib/db/migrate.ts
+```
+
+This will create:
+- `users` - User profiles
+- `videos` - All generated animations with metadata
+- `user_stats` - Aggregated statistics (video count, storage usage)
+- `video_tags` - Optional tagging system
+
+**📖 For detailed database documentation, see [DRIZZLE_GUIDE.md](DRIZZLE_GUIDE.md)**
 
 ### 3. Pinecone 📊
 1. Visit [pinecone.io](https://www.pinecone.io/)
@@ -374,6 +402,8 @@ movinglines/
 │
 ├── frontend/                   # Next.js application
 │   ├── app/                   # Next.js pages
+
+Note: Email confirmations are disabled by default in this setup. No redirect URLs are required.
 │   ├── components/            # React components
 │   ├── lib/                   # Utilities
 │   ├── package.json
