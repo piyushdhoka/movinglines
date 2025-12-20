@@ -25,23 +25,19 @@ export function AuthModal({ onCloseAction }: AuthModalProps) {
     try {
       if (isSignUp) {
         await signUp(email, password)
-        setError('') // Clear error on success
-        // Don't close modal on signup - user needs to confirm email
-        // onClose()
+        setError('')
+        onCloseAction()
       } else {
         await signIn(email, password)
         setError('')
         onCloseAction()
       }
     } catch (err: any) {
-      // Handle Supabase specific errors
-      let errorMessage = err.message || 'An error occurred'
+      const errorMessage = err.message || 'An error occurred'
       
-      // Suppress token/refresh related errors from being shown
       if (errorMessage.includes('Refresh Token Not Found') || 
           errorMessage.includes('Invalid Refresh Token')) {
         console.warn('Token refresh issue (will retry automatically):', errorMessage)
-        // Don't show this error to user, it will be handled automatically
         return
       }
       
@@ -108,12 +104,6 @@ export function AuthModal({ onCloseAction }: AuthModalProps) {
 
             {error && (
               <p className="text-red-400 text-sm">{error}</p>
-            )}
-
-            {isSignUp && !error && (
-              <p className="text-dark-400 text-sm">
-                A confirmation email will be sent to verify your account.
-              </p>
             )}
 
             <button
