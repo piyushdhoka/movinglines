@@ -2,15 +2,10 @@ import { drizzle } from 'drizzle-orm/postgres-js'
 import postgres from 'postgres'
 import * as schema from './schema'
 
-if (!process.env.DATABASE_URL) {
-  throw new Error(
-    'DATABASE_URL is not defined. Please add it to your .env.local file.\n' +
-    'Get it from: Supabase Dashboard → Settings → Database → Connection string (URI)'
-  )
-}
+// Only throw error at runtime, not at build time
+const databaseUrl = process.env.DATABASE_URL
 
-
-const queryClient = postgres(process.env.DATABASE_URL, { 
+const queryClient = postgres(databaseUrl || 'postgresql://localhost/dummy', { 
   max: 1,
   prepare: false, 
   idle_timeout: 20,
