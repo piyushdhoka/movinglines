@@ -9,35 +9,55 @@ export const qualityLabels: Record<Quality, string> = {
   k: '4K'
 }
 
-export async function generateAnimation(prompt: string, quality: Quality, token: string) {
-  const res = await fetch(`${API_URL}/api/animations/generate`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
-    },
-    body: JSON.stringify({ prompt, quality })
-  })
-  
-  if (!res.ok) throw new Error('Failed to generate animation')
+async function handleResponse(res: Response) {
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}))
+    throw new Error(errorData.detail || `HTTP ${res.status}: ${res.statusText}`)
+  }
   return res.json()
+}
+
+export async function generateAnimation(prompt: string, quality: Quality, token: string) {
+  try {
+    const res = await fetch(`${API_URL}/api/animations/generate`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({ prompt, quality })
+    })
+    
+    return await handleResponse(res)
+  } catch (error) {
+    console.error('Animation generation failed:', error)
+    throw error
+  }
 }
 
 export async function getTaskStatus(taskId: string, token: string) {
-  const res = await fetch(`${API_URL}/api/animations/status/${taskId}`, {
-    headers: { 'Authorization': `Bearer ${token}` }
-  })
-  
-  if (!res.ok) throw new Error('Failed to get task status')
-  return res.json()
+  try {
+    const res = await fetch(`${API_URL}/api/animations/status/${taskId}`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    })
+    
+    return await handleResponse(res)
+  } catch (error) {
+    console.error('Failed to get task status:', error)
+    throw error
+  }
 }
 
 export async function getUserVideos(token: string) {
-  const res = await fetch(`${API_URL}/api/animations/videos`, {
-    headers: { 'Authorization': `Bearer ${token}` }
-  })
-  
-  if (!res.ok) throw new Error('Failed to get videos')
-  return res.json()
+  try {
+    const res = await fetch(`${API_URL}/api/animations/videos`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    })
+    
+    return await handleResponse(res)
+  } catch (error) {
+    console.error('Failed to get videos:', error)
+    throw error
+  }
 }
 

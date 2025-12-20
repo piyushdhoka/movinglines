@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Outfit, JetBrains_Mono } from 'next/font/google'
 import './globals.css'
 import { AuthProvider } from '@/components/providers/AuthProvider'
+import { ErrorBoundary } from '@/components/providers/ErrorBoundary'
 
 const outfit = Outfit({ 
   subsets: ['latin'],
@@ -16,6 +17,9 @@ const jetbrains = JetBrains_Mono({
 export const metadata: Metadata = {
   title: 'Manim Studio | AI Animation Generator',
   description: 'Generate beautiful mathematical animations from text prompts',
+  icons: {
+    icon: '/favicon.svg',
+  },
 }
 
 export default function RootLayout({
@@ -26,9 +30,11 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <body className={`${outfit.variable} ${jetbrains.variable} font-sans bg-dark-950 text-dark-50 antialiased`}>
-        <AuthProvider>
-          {children}
-        </AuthProvider>
+        <ErrorBoundary>
+          <AuthProvider>
+            {children}
+          </AuthProvider>
+        </ErrorBoundary>
       </body>
     </html>
   )
