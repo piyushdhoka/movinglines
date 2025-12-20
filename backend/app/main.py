@@ -13,6 +13,8 @@ app.add_middleware(
     allow_origins=[
         "http://localhost:3000",
         "https://movinglines.vercel.app",
+        "https://movinglines.co.in",
+        "https://www.movinglines.co.in",
     ],
     allow_credentials=True,
     allow_methods=["*"],
