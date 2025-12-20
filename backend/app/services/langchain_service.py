@@ -1,4 +1,5 @@
 import os
+import httpx
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
@@ -43,17 +44,36 @@ async def generate_manim_script(prompt: str) -> str:
     
     print(f"Using Gemini with API key: {api_key[:10]}...")
     
-    llm = ChatGoogleGenerativeAI(
-        model="gemini-2.0-flash",
-        google_api_key=api_key,
-        temperature=0.7
+    # Configure HTTP client with better settings for Azure
+    http_client = httpx.AsyncClient(
+        timeout=httpx.Timeout(60.0, connect=10.0),  # 60s total, 10s connect
+        limits=httpx.Limits(max_keepalive_connections=5, max_connections=10),
+        follow_redirects=True
     )
     
-    template = ChatPromptTemplate.from_template(MANIM_SYSTEM_PROMPT)
-    
-    chain = template | llm | StrOutputParser()
-    
-    response = await chain.ainvoke({"prompt": prompt})
+    try:
+        llm = ChatGoogleGenerativeAI(
+            model="gemini-2.0-flash",
+            google_api_key=api_key,
+            temperature=0.7,
+            timeout=45,  # 45 second timeout
+            max_retries=1,  # Only retry once
+            http_async_client=http_client  # Use custom HTTP client
+        )
+        
+        template = ChatPromptTemplate.from_template(MANIM_SYSTEM_PROMPT)
+        
+        chain = template | llm | StrOutputParser()
+        
+        response = await chain.ainvoke({"prompt": prompt})
+    except Exception as e:
+        error_msg = str(e)
+        print(f"Gemini API Error: {error_msg}")
+        if "timeout" in error_msg.lower() or "connect" in error_msg.lower() or "tls" in error_msg.lower():
+            raise Exception("Unable to connect to AI service from server. This appears to be a network issue. Please try again.")
+        raise
+    finally:
+        await http_client.aclose()
     
     # Clean up the response - remove markdown code blocks if present
     response = response.strip()
@@ -62,6 +82,6 @@ async def generate_manim_script(prompt: str) -> str:
     elif response.startswith("```"):
         response = response[3:]
     if response.endswith("```"):
-        response = response[:-3]
+        response = response[:-3:]
     
     return response.strip()

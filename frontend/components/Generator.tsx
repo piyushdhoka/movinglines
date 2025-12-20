@@ -64,6 +64,10 @@ export function Generator({ onVideoGeneratedAction }: GeneratorProps) {
     setError('')
     setStatus('starting')
     setProgress(0)
+    
+    // Set a temporary taskId to show loading state immediately
+    const tempTaskId = 'temp-' + Date.now()
+    setTaskId(tempTaskId)
 
     try {
       const data = await generateAnimation(prompt, quality, session.access_token)
@@ -72,6 +76,7 @@ export function Generator({ onVideoGeneratedAction }: GeneratorProps) {
     } catch (err: any) {
       setError(err.message || 'Failed to start generation')
       setStatus('')
+      setTaskId(null) // Clear temp taskId on error
     }
   }
 
