@@ -5,10 +5,10 @@ import { Sparkles, LogOut } from 'lucide-react'
 import { motion } from 'framer-motion'
 
 type NavbarProps = {
-  onAuthClick: () => void
+  onAuthClickAction: () => void
 }
 
-export function Navbar({ onAuthClick }: NavbarProps) {
+export function Navbar({ onAuthClickAction }: NavbarProps) {
   const { user, signOut } = useAuth()
 
   return (
@@ -39,7 +39,7 @@ export function Navbar({ onAuthClick }: NavbarProps) {
               </button>
             </>
           ) : (
-            <button onClick={onAuthClick} className="btn-primary text-sm">
+            <button onClick={onAuthClickAction} className="btn-primary text-sm">
               Sign In
             </button>
           )}

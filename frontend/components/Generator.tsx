@@ -7,12 +7,12 @@ import { motion } from 'framer-motion'
 import { Sparkles, Loader2, Play, Check } from 'lucide-react'
 
 type GeneratorProps = {
-  onVideoGenerated: () => void
+  onVideoGeneratedAction: () => void
 }
 
 const qualities: Quality[] = ['l', 'm', 'h', 'k']
 
-export function Generator({ onVideoGenerated }: GeneratorProps) {
+export function Generator({ onVideoGeneratedAction }: GeneratorProps) {
   const { session } = useAuth()
   const [prompt, setPrompt] = useState('')
   const [quality, setQuality] = useState<Quality>('m')
@@ -33,7 +33,7 @@ export function Generator({ onVideoGenerated }: GeneratorProps) {
         if (data.status === 'completed') {
           clearInterval(interval)
           setTaskId(null)
-          onVideoGenerated()
+          onVideoGeneratedAction()
         } else if (data.status === 'failed') {
           clearInterval(interval)
           setError(data.error || 'Generation failed')
@@ -45,7 +45,7 @@ export function Generator({ onVideoGenerated }: GeneratorProps) {
     }, 2000)
 
     return () => clearInterval(interval)
-  }, [taskId, session?.access_token, onVideoGenerated])
+  }, [taskId, session?.access_token, onVideoGeneratedAction])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

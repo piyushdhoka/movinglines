@@ -23,7 +23,7 @@ export default function Home() {
 
   return (
     <main className="min-h-screen">
-      <Navbar onAuthClick={() => setShowAuth(true)} />
+      <Navbar onAuthClickAction={() => setShowAuth(true)} />
       
       {/* Hero Section */}
       <section className="relative pt-32 pb-20 px-6">
@@ -58,7 +58,7 @@ export default function Home() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
             >
-              <Generator onVideoGenerated={() => setRefreshGallery(r => r + 1)} />
+              <Generator onVideoGeneratedAction={() => setRefreshGallery(r => r + 1)} />
             </motion.div>
           ) : (
             <motion.button
@@ -85,7 +85,7 @@ export default function Home() {
       )}
 
       {/* Auth Modal */}
-      {showAuth && <AuthModal onClose={() => setShowAuth(false)} />}
+      {showAuth && <AuthModal onCloseAction={() => setShowAuth(false)} />}
     </main>
   )
 }

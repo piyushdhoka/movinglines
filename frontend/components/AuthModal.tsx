@@ -6,10 +6,10 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { X, Mail, Lock, Loader2 } from 'lucide-react'
 
 type AuthModalProps = {
-  onClose: () => void
+  onCloseAction: () => void
 }
 
-export function AuthModal({ onClose }: AuthModalProps) {
+export function AuthModal({ onCloseAction }: AuthModalProps) {
   const [isSignUp, setIsSignUp] = useState(false)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -25,12 +25,28 @@ export function AuthModal({ onClose }: AuthModalProps) {
     try {
       if (isSignUp) {
         await signUp(email, password)
+        setError('') // Clear error on success
+        // Don't close modal on signup - user needs to confirm email
+        // onClose()
       } else {
         await signIn(email, password)
+        setError('')
+        onCloseAction()
       }
-      onClose()
     } catch (err: any) {
-      setError(err.message || 'An error occurred')
+      // Handle Supabase specific errors
+      let errorMessage = err.message || 'An error occurred'
+      
+      // Suppress token/refresh related errors from being shown
+      if (errorMessage.includes('Refresh Token Not Found') || 
+          errorMessage.includes('Invalid Refresh Token')) {
+        console.warn('Token refresh issue (will retry automatically):', errorMessage)
+        // Don't show this error to user, it will be handled automatically
+        return
+      }
+      
+      setError(errorMessage)
+      console.error('Auth error:', err)
     } finally {
       setLoading(false)
     }
@@ -43,7 +59,7 @@ export function AuthModal({ onClose }: AuthModalProps) {
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
-        onClick={onClose}
+        onClick={onCloseAction}
       >
         <motion.div
           initial={{ scale: 0.95, opacity: 0 }}
@@ -57,7 +73,7 @@ export function AuthModal({ onClose }: AuthModalProps) {
               {isSignUp ? 'Create Account' : 'Welcome Back'}
             </h2>
             <button
-              onClick={onClose}
+              onClick={onCloseAction}
               className="p-2 rounded-lg hover:bg-dark-800 transition-colors"
             >
               <X className="w-5 h-5" />
@@ -94,6 +110,12 @@ export function AuthModal({ onClose }: AuthModalProps) {
               <p className="text-red-400 text-sm">{error}</p>
             )}
 
+            {isSignUp && !error && (
+              <p className="text-dark-400 text-sm">
+                A confirmation email will be sent to verify your account.
+              </p>
+            )}
+
             <button
               type="submit"
               disabled={loading}
@@ -106,7 +128,12 @@ export function AuthModal({ onClose }: AuthModalProps) {
 
           <div className="mt-6 text-center">
             <button
-              onClick={() => setIsSignUp(!isSignUp)}
+              onClick={() => {
+                setIsSignUp(!isSignUp)
+                setError('')
+                setEmail('')
+                setPassword('')
+              }}
               className="text-dark-400 hover:text-white transition-colors"
             >
               {isSignUp 
