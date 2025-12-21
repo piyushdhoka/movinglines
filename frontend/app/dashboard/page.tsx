@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Plus, Zap, Terminal, LayoutTemplate, History, MoreVertical, Cpu, PanelLeftClose, ChevronRight, MessageSquare, Video, Box, Play, Code, Copy, Check, ArrowRight, X, Send, Loader2, Download, LogOut, Settings, Trash2 } from 'lucide-react';
+import { Plus, Zap, Terminal, LayoutTemplate, History, MoreVertical, Cpu, PanelLeftClose, PanelLeftOpen, ChevronRight, MessageSquare, Video, Box, Play, Code, Copy, Check, ArrowRight, X, Send, Loader2, Download, LogOut, Settings, Trash2 } from 'lucide-react';
 import { useAuth } from '@/components/providers/AuthProvider';
 import { useRouter } from 'next/navigation';
 import { generateAnimation, getTaskStatus, getChats, deleteChat, getChatHistory, Quality } from '@/lib/api';
@@ -187,8 +187,8 @@ export default function DashboardPage() {
   return (
     <div className="h-screen bg-black flex overflow-hidden font-sans text-zinc-300">
       {/* Sidebar */}
-      <aside className={`fixed md:relative z-[100] h-full transition-all duration-300 border-r border-white/[0.06] bg-[#050505] ${isSidebarOpen ? 'w-full md:w-64' : 'w-0'} flex flex-col`}>
-        <div className="p-6 flex items-center justify-between shrink-0">
+      <aside className={`fixed md:relative z-[100] h-full transition-all duration-300 border-r border-white/[0.06] bg-[#050505] ${isSidebarOpen ? 'w-full md:w-64' : 'w-0 border-none'} flex flex-col overflow-hidden`}>
+        <div className="p-6 flex items-center justify-between shrink-0 min-w-[256px]">
           <div className="flex items-center gap-3">
              <div className="w-6 h-6 bg-white rounded flex items-center justify-center"><Zap size={12} fill="black" /></div>
              <span className="font-bold text-[13px] text-white">MOVINGLINES</span>
@@ -271,9 +271,18 @@ export default function DashboardPage() {
       {/* Main Container */}
       <main className="flex-1 flex flex-col bg-black min-w-0">
         <header className="h-14 border-b border-white/[0.06] flex items-center justify-between px-6 backdrop-blur-xl">
-          <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="text-zinc-600 hover:text-white"><PanelLeftClose size={18}/></button>
+          <div className="flex items-center gap-4">
+            <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="text-zinc-600 hover:text-white">
+              {isSidebarOpen ? <PanelLeftClose size={18}/> : <PanelLeftOpen size={18}/>}
+            </button>
+            {!isSidebarOpen && (
+              <div className="flex items-center gap-3">
+                 <div className="w-6 h-6 bg-white rounded flex items-center justify-center"><Zap size={12} fill="black" /></div>
+                 <span className="font-bold text-[13px] text-white">MOVINGLINES</span>
+              </div>
+            )}
+          </div>
           <div className="flex gap-4">
-             <button className="bg-white text-black text-[10px] font-black px-4 rounded-full">DEPLOY</button>
           </div>
         </header>
 
