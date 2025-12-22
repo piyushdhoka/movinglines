@@ -18,6 +18,7 @@ class Quality(str, Enum):
 class AnimationRequest(BaseModel):
     prompt: str
     quality: Quality = Quality.MEDIUM
+    duration: int = 15
     chat_id: Optional[str] = None
 
 class AnimationResponse(BaseModel):
@@ -92,6 +93,7 @@ async def generate_animation(
         task_id,
         request.prompt,
         request.quality.value,
+        request.duration,
         user_id
     )
     
@@ -102,15 +104,15 @@ async def generate_animation(
         message="Animation generation started"
     )
 
-async def process_animation(task_id: str, prompt: str, quality: str, user_id: str):
+async def process_animation(task_id: str, prompt: str, quality: str, duration: int, user_id: str):
     import traceback
     try:
         print(f"[{task_id}] Starting animation generation for prompt: {prompt[:50]}...")
         
         update_task_in_db(task_id, {"status": "generating_script", "progress": 20})
         
-        print(f"[{task_id}] Generating Manim script...")
-        script = await generate_manim_script(prompt)
+        print(f"[{task_id}] Generating Manim script (duration: {duration}s)...")
+        script = await generate_manim_script(prompt, duration)
         print(f"[{task_id}] Script generated:\n{script[:200]}...")
         
         update_task_in_db(task_id, {

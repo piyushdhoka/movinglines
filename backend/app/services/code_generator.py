@@ -17,7 +17,7 @@ REQUIREMENTS:
 2. Class must be named `GeneratedScene`
 3. Title at TOP, content BELOW (no overlaps!)
 4. Use modern Manim CE syntax (no deprecated functions)
-5. Keep animation between 10-30 seconds total
+5. Keep animation between {min_duration} and {max_duration} seconds total
 6. Choose correct Scene type: Scene (2D), ThreeDScene (3D), MovingCameraScene (camera control)
 
 Begin with `from manim import *` immediately:"""
@@ -62,7 +62,7 @@ def extract_code(text: str) -> str:
     return text.strip()
 
 
-async def generate_manim_script(user_prompt: str) -> str:
+async def generate_manim_script(user_prompt: str, duration: int = 15) -> str:
     """Generate Manim script from user prompt using RAG."""
     logger.info(f"[LLM] Generating script for: {user_prompt[:100]}...")
     
@@ -84,7 +84,12 @@ async def generate_manim_script(user_prompt: str) -> str:
     llm = get_llm()
     
     system_prompt_with_context = MANIM_SYSTEM_PROMPT.replace("{context}", context)
-    user_prompt_formatted = MANIM_USER_PROMPT.replace("{user_prompt}", user_prompt)
+    
+    # Calculate duration constraints
+    min_dur = max(5, duration - 2)
+    max_dur = duration + 2
+    
+    user_prompt_formatted = MANIM_USER_PROMPT.replace("{user_prompt}", user_prompt).replace("{min_duration}", str(min_dur)).replace("{max_duration}", str(max_dur))
     
     # Step 3: Create messages directly (avoid ChatPromptTemplate parsing braces)
     messages = [
