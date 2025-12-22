@@ -15,6 +15,8 @@ export function Generator({ onVideoGeneratedAction }: GeneratorProps) {
   const { session } = useAuth()
   const [prompt, setPrompt] = useState('')
   const [quality, setQuality] = useState<Quality>('m')
+  // Default duration for quick generation (seconds)
+  const [duration] = useState<number>(15)
   const [taskId, setTaskId] = useState<string | null>(null)
   const [status, setStatus] = useState<string>('')
   const [progress, setProgress] = useState(0)
@@ -69,7 +71,8 @@ export function Generator({ onVideoGeneratedAction }: GeneratorProps) {
     setTaskId(tempTaskId)
 
     try {
-      const data = await generateAnimation(prompt, quality, session.access_token)
+      // Pass default duration and no chatId for this simple generator
+      const data = await generateAnimation(prompt, quality, duration, session.access_token)
       setTaskId(data.task_id)
       setPrompt('') // Clear prompt on start
     } catch (err: any) {
