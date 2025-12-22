@@ -5,9 +5,12 @@ RUN apt-get update && apt-get install -y \
     ffmpeg \
     libcairo2-dev \
     libpango1.0-dev \
+    # texlive-full \
     texlive-base \
     texlive-latex-base \
     texlive-fonts-recommended \
+    texlive-preview \
+
     libffi-dev \
     build-essential \
     gcc \
