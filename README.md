@@ -4,8 +4,8 @@
 
 | Component | Technology |
 |-----------|-----------|
-| **Frontend** | Next.js 16, React 19, Tailwind CSS, Framer Motion |
-| **Backend** | FastAPI, Python 3.11+, LangChain |
+| **Frontend** | Next.js 16, React 19, Tailwind CSS, Framer Motion, Drizzle ORM |
+| **Backend** | FastAPI, Python 3.12+, LangChain |
 | **AI** | Google Gemini 1.5 Pro |
 | **Vector DB** | Pinecone (RAG for Manim examples) |
 | **Auth & Storage** | Supabase |
@@ -237,34 +237,70 @@ PINECONE_INDEX=manim-examples
 3. Name: `manim-videos`
 4. Make it **public** (uncheck "Private")
 
-### Create Videos Table
+### Create Tables
 
-In Supabase SQL Editor, run:
+In Supabase SQL Editor, run the following to create the necessary tables:
 
 ```sql
--- Create videos table
-CREATE TABLE videos (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
-  prompt TEXT NOT NULL,
-  video_url TEXT NOT NULL,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+-- 1. Create users table (links to Supabase Auth)
+CREATE TABLE IF NOT EXISTS public.users (
+  id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+  email TEXT NOT NULL UNIQUE,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Enable Row Level Security
+-- 2. Create videos table
+CREATE TABLE IF NOT EXISTS public.videos (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES public.users(id) ON DELETE CASCADE,
+  prompt TEXT NOT NULL,
+  video_url TEXT NOT NULL,
+  bucket_path TEXT NOT NULL,
+  quality TEXT DEFAULT 'm',
+  status TEXT DEFAULT 'completed',
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- 3. Create chats table
+CREATE TABLE IF NOT EXISTS public.chats (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES public.users(id) ON DELETE CASCADE,
+  title TEXT NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- 4. Create tasks table
+CREATE TABLE IF NOT EXISTS public.tasks (
+  id UUID PRIMARY KEY,
+  user_id UUID REFERENCES public.users(id) ON DELETE CASCADE,
+  chat_id UUID REFERENCES public.chats(id) ON DELETE CASCADE,
+  prompt TEXT NOT NULL,
+  quality TEXT NOT NULL,
+  status TEXT NOT NULL,
+  progress INTEGER DEFAULT 0,
+  video_url TEXT,
+  generated_script TEXT,
+  error_message TEXT,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Enable Row Level Security (RLS)
 ALTER TABLE videos ENABLE ROW LEVEL SECURITY;
+ALTER TABLE chats ENABLE ROW LEVEL SECURITY;
+ALTER TABLE tasks ENABLE ROW LEVEL SECURITY;
 
--- Policy: Users can view their own videos
-CREATE POLICY "Users can view own videos" ON videos
-  FOR SELECT USING (auth.uid() = user_id);
-
--- Policy: Users can insert their own videos
-CREATE POLICY "Users can insert own videos" ON videos
-  FOR INSERT WITH CHECK (auth.uid() = user_id);
-
--- Create index for faster queries
-CREATE INDEX idx_videos_user_id ON videos(user_id);
-CREATE INDEX idx_videos_created_at ON videos(created_at DESC);
+-- Create policies (simplified for development)
+CREATE POLICY "Users can view own videos" ON videos FOR SELECT USING (auth.uid() = user_id);
+CREATE POLICY "Users can insert own videos" ON videos FOR INSERT WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "Users can view own chats" ON chats FOR SELECT USING (auth.uid() = user_id);
+CREATE POLICY "Users can insert own chats" ON chats FOR INSERT WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "Users can delete own chats" ON chats FOR DELETE USING (auth.uid() = user_id);
+CREATE POLICY "Users can view own tasks" ON tasks FOR SELECT USING (auth.uid() = user_id);
+CREATE POLICY "Users can insert own tasks" ON tasks FOR INSERT WITH CHECK (auth.uid() = user_id);
 ```
 
 ---
@@ -365,11 +401,22 @@ python -m scripts.seed_pinecone
 
 ## 📚 API Endpoints
 
+### Authentication
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/auth/signup` | Register a new user |
+| POST | `/api/auth/login` | Login user |
+| POST | `/api/auth/logout` | Logout user |
+
+### Animations & Chats
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | POST | `/api/animations/generate` | Generate animation from prompt |
 | GET | `/api/animations/status/{task_id}` | Check generation status |
 | GET | `/api/animations/videos` | List user's videos |
+| GET | `/api/animations/chats` | List user's chat sessions |
+| DELETE | `/api/animations/chats/{chat_id}` | Delete a chat session |
+| GET | `/api/animations/chats/{chat_id}/history` | Get chat history (tasks) |
 | GET | `/health` | Health check |
 
 ---
@@ -393,8 +440,10 @@ movinglines/
 │   ├── app/
 │   │   ├── main.py            # FastAPI app setup
 │   │   ├── config.py          # Configuration
-│   │   ├── routers/           # API endpoints
-│   │   └── services/          # Business logic
+│   │   ├── routers/           # API endpoints (animations, auth)
+│   │   ├── services/          # Business logic (LLM, rendering, DB)
+│   │   └── prompts/           # LLM prompts
+│   ├── migrations/            # Database migrations
 │   ├── scripts/
 │   │   └── seed_pinecone.py   # RAG seeding
 │   ├── requirements.txt
@@ -402,10 +451,10 @@ movinglines/
 │
 ├── frontend/                   # Next.js application
 │   ├── app/                   # Next.js pages
-
-Note: Email confirmations are disabled by default in this setup. No redirect URLs are required.
 │   ├── components/            # React components
-│   ├── lib/                   # Utilities
+│   ├── lib/                   # Utilities & DB schema
+│   │   ├── db/                # Drizzle ORM setup
+│   │   └── supabase.ts        # Supabase client
 │   ├── package.json
 │   └── Dockerfile
 │
