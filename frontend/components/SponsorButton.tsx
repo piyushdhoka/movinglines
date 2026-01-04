@@ -2,23 +2,40 @@
 
 import { useState, useRef, useEffect } from 'react'
 import { Copy, Check } from 'lucide-react'
-import { Button } from '@/components/ui/button'
 
 export function SponsorButton() {
   const [isOpen, setIsOpen] = useState(false)
   const [copied, setCopied] = useState(false)
-  const buttonRef = useRef<HTMLButtonElement>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
 
-  const handleCopyUPI = () => {
-    navigator.clipboard.writeText('piyushdhoka007@okhdfcbank')
-    setCopied(true)
-    setTimeout(() => setCopied(false), 2000)
+  const handleCopyUPI = async (e: React.MouseEvent) => {
+    e.stopPropagation()
+    try {
+      await navigator.clipboard.writeText('piyushdhoka007@okhdfcbank')
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    } catch (err) {
+      console.error('Failed to copy:', err)
+      // Fallback for older browsers
+      const textArea = document.createElement('textarea')
+      textArea.value = 'piyushdhoka007@okhdfcbank'
+      document.body.appendChild(textArea)
+      textArea.select()
+      try {
+        document.execCommand('copy')
+        setCopied(true)
+        setTimeout(() => setCopied(false), 2000)
+      } catch (e) {
+        console.error('Fallback copy failed:', e)
+      }
+      document.body.removeChild(textArea)
+    }
   }
 
   // Close when clicking outside
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (buttonRef.current && !buttonRef.current.contains(event.target as Node)) {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
         setIsOpen(false)
       }
     }
@@ -30,9 +47,8 @@ export function SponsorButton() {
   }, [isOpen])
 
   return (
-    <div className="fixed bottom-8 right-8 z-40">
+    <div ref={containerRef} className="fixed bottom-8 right-8 z-40">
       <button
-        ref={buttonRef}
         onClick={() => setIsOpen(!isOpen)}
         className="h-14 w-14 rounded-full bg-red-500 hover:bg-red-600 flex items-center justify-center text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
         title="Support us"
