@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { ArrowRight, Menu, Sparkles, X } from 'lucide-react'
+import { ArrowRight, Github, Menu, Sparkles, X } from 'lucide-react'
 import { useAuth } from '@/components/providers/AuthProvider'
 import { Button } from '@/components/ui/button'
 import {
@@ -31,19 +31,21 @@ export function Header({ onLaunch }: { onLaunch: () => void }) {
             </div>
             <div className="leading-tight">
               <p className="text-xl font-black uppercase tracking-tight">MovingLines</p>
-              <p className="text-xs font-semibold">Neobrutal math engine</p>
             </div>
           </Link>
         </div>
 
-        <div className="hidden lg:flex items-center gap-6">
+        <div className="hidden lg:flex items-center gap-3">
           <NavigationMenu>
-            <NavigationMenuList>
+            <NavigationMenuList className="gap-3 flex">
               {navLinks.map((item) => (
                 <NavigationMenuItem key={item.label}>
-                  <NavigationMenuLink className="text-sm font-semibold uppercase tracking-tight border-2 border-border px-3 py-2 rounded-md bru-shadow bg-secondary hover:-translate-y-1 transition-transform" href={item.href}>
+                  <Link
+                    href={item.href}
+                    className="text-sm font-semibold uppercase tracking-tight border-2 border-border px-4 py-2.5 rounded-md bru-shadow bg-secondary hover:-translate-y-1 transition-transform inline-block"
+                  >
                     {item.label}
-                  </NavigationMenuLink>
+                  </Link>
                 </NavigationMenuItem>
               ))}
             </NavigationMenuList>
@@ -86,6 +88,11 @@ export function Header({ onLaunch }: { onLaunch: () => void }) {
                   </Link>
                 </SheetClose>
               ))}
+              <SheetClose asChild>
+                <a href="https://github.com/piyushdhoka/movinglines" target="_blank" rel="noreferrer" className="bru-card px-3 py-2 text-sm font-semibold flex items-center gap-2">
+                  <Github className="h-4 w-4" /> GitHub
+                </a>
+              </SheetClose>
             </div>
             <div className="mt-6 flex flex-col gap-3">
               {user ? (

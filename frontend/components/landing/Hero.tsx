@@ -28,9 +28,9 @@ export function Hero({ onLaunch }: { onLaunch: () => void }) {
               Launch the studio <ArrowRight className="h-4 w-4" />
             </Button>
             <Button variant="outline" className="bru-ghost" asChild>
-              <Link href="https://github.com/" target="_blank" rel="noreferrer">
+              <a href="https://github.com/piyushdhoka/movinglines" target="_blank" rel="noreferrer">
                 <Github className="h-4 w-4" /> Star on GitHub
-              </Link>
+              </a>
             </Button>
           </div>
 

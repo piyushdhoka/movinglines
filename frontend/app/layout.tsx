@@ -3,6 +3,7 @@ import { GeistSans } from 'geist/font/sans'
 import './globals.css'
 import { AuthProvider } from '@/components/providers/AuthProvider'
 import { ErrorBoundary } from '@/components/providers/ErrorBoundary'
+import { SponsorButton } from '@/components/SponsorButton'
 
 export const metadata: Metadata = {
   title: 'MovingLines | AI-Powered Math Animations',
@@ -23,6 +24,7 @@ export default function RootLayout({
         <ErrorBoundary>
           <AuthProvider>
             {children}
+            <SponsorButton />
           </AuthProvider>
         </ErrorBoundary>
       </body>
