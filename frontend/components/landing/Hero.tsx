@@ -8,18 +8,18 @@ import { Card, CardContent } from '@/components/ui/card'
 
 export function Hero({ onLaunch }: { onLaunch: () => void }) {
   return (
-    <section className="relative max-w-6xl mx-auto px-4 md:px-6 pt-16 pb-12 md:pb-20 lg:pt-24">
-      <div className="inline-flex items-center gap-3 bru-badge mb-6">
-        <span className="inline-flex h-3 w-3 rounded-full bg-destructive" />
+    <section className="relative max-w-6xl mx-auto px-4 md:px-6 pt-12 pb-8 md:pt-16 md:pb-12 lg:pt-24 lg:pb-20">
+      <div className="inline-flex items-center gap-2 md:gap-3 bru-badge mb-4 md:mb-6 text-xs md:text-sm">
+        <span className="inline-flex h-2 w-2 md:h-3 md:w-3 rounded-full bg-destructive" />
         EARLY ACCESS
       </div>
 
-      <div className="grid lg:grid-cols-[1.1fr_0.9fr] gap-10 items-center">
-        <div className="space-y-6">
-          <h1 className="text-4xl md:text-6xl leading-[1.05]">
+      <div className="grid lg:grid-cols-[1.1fr_0.9fr] gap-6 md:gap-8 lg:gap-10 items-center">
+        <div className="space-y-4 md:space-y-6">
+          <h1 className="text-3xl md:text-5xl lg:text-6xl leading-[1.05] font-black">
             Neobrutalist playground for math-powered animations.
           </h1>
-          <p className="text-lg text-foreground/80 max-w-2xl">
+          <p className="text-base md:text-lg text-foreground/80 max-w-2xl">
             Describe, iterate, and render Manim scenes with confident defaults, auditable prompts, and a UI that stays out of your way.
           </p>
 
@@ -34,24 +34,24 @@ export function Hero({ onLaunch }: { onLaunch: () => void }) {
             </Button>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-4">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 md:gap-3 pt-3 md:pt-4">
             {[['3x', 'Faster iteration'], ['0 setup', 'Bun + Next ready'], ['99.9%', 'Render uptime'], ['SOC2', 'Ready controls']].map(([label, sub]) => (
               <Card key={label} className="bru-card">
-                <CardContent className="p-3">
-                  <p className="text-xl font-black">{label}</p>
-                  <p className="text-xs uppercase font-semibold tracking-tight">{sub}</p>
+                <CardContent className="p-2 md:p-3">
+                  <p className="text-lg md:text-xl font-black">{label}</p>
+                  <p className="text-[10px] md:text-xs uppercase font-semibold tracking-tight">{sub}</p>
                 </CardContent>
               </Card>
             ))}
           </div>
         </div>
 
-        <div className="bru-card bg-secondary p-6 space-y-4">
-          <div className="flex items-center justify-between">
-            <Badge className="bru-badge">Prompt</Badge>
-            <Badge className="bru-badge bg-main text-main-foreground">Live render</Badge>
+        <div className="bru-card bg-secondary p-4 md:p-6 space-y-3 md:space-y-4">
+          <div className="flex items-center justify-between gap-2">
+            <Badge className="bru-badge text-xs">Prompt</Badge>
+            <Badge className="bru-badge bg-main text-main-foreground text-xs">Live render</Badge>
           </div>
-          <div className="rounded-lg border-2 border-border p-4 bg-background min-h-[140px] flex items-center text-left text-base leading-relaxed">
+          <div className="rounded-lg border-2 border-border p-3 md:p-4 bg-background min-h-[120px] md:min-h-[140px] flex items-center text-left text-sm md:text-base leading-relaxed">
             "Simulate a Riemann surface folding into a torus. Track a red geodesic, label critical points, and keep camera easing at 1.4."
           </div>
           <div className="grid grid-cols-2 gap-3">

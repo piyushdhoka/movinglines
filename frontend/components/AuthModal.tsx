@@ -58,13 +58,13 @@ export function AuthModal({ onCloseAction }: AuthModalProps) {
 
   return (
     <Dialog open onOpenChange={onCloseAction}>
-      <DialogContent className="bru-card bg-secondary-background max-w-md p-0 overflow-hidden border-2 border-border">
-        <div className="p-8 space-y-6">
+      <DialogContent className="bru-card bg-secondary-background max-w-[95vw] sm:max-w-md p-0 overflow-hidden border-2 border-border">
+        <div className="p-6 md:p-8 space-y-4 md:space-y-6">
           <DialogHeader>
-            <DialogTitle className="text-3xl font-black tracking-tight">
+            <DialogTitle className="text-2xl md:text-3xl font-black tracking-tight">
               {isSignUp ? 'Create account' : 'Welcome back'}
             </DialogTitle>
-            <DialogDescription className="text-foreground/70 text-base">
+            <DialogDescription className="text-foreground/70 text-sm md:text-base">
               {isSignUp ? 'Start your animation journey' : 'Continue your animation adventure'}
             </DialogDescription>
           </DialogHeader>

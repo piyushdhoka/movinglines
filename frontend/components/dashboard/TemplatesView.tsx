@@ -31,19 +31,19 @@ export function TemplatesView() {
   }
 
   return (
-    <div className="flex-1 overflow-y-auto p-12">
-      <div className="mb-8">
-        <p className="bru-badge inline-block mb-3">Templates</p>
-        <h2 className="text-3xl font-bold">Get started with examples</h2>
+    <div className="flex-1 overflow-y-auto p-4 md:p-8 lg:p-12">
+      <div className="mb-6 md:mb-8">
+        <p className="bru-badge inline-block mb-2 md:mb-3 text-xs md:text-sm">Templates</p>
+        <h2 className="text-2xl md:text-3xl font-bold">Get started with examples</h2>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 max-w-6xl">
         {templates.map((template) => (
-          <div key={template.id} className="bru-card p-6 hover:translate-x-[2px] hover:translate-y-[2px] transition-transform">
-            <div className="h-12 w-12 rounded-md border-2 border-border bru-shadow bg-main flex items-center justify-center mb-6">
-              <Sparkles className="h-6 w-6 text-background" />
+          <div key={template.id} className="bru-card p-4 md:p-6 hover:translate-x-[2px] hover:translate-y-[2px] transition-transform">
+            <div className="h-10 w-10 md:h-12 md:w-12 rounded-md border-2 border-border bru-shadow bg-main flex items-center justify-center mb-4 md:mb-6">
+              <Sparkles className="h-5 w-5 md:h-6 md:w-6 text-background" />
             </div>
-            <h3 className="font-bold text-lg mb-2">{template.title}</h3>
-            <p className="text-muted-foreground text-sm mb-6">{template.description}</p>
+            <h3 className="font-bold text-base md:text-lg mb-2">{template.title}</h3>
+            <p className="text-muted-foreground text-xs md:text-sm mb-4 md:mb-6">{template.description}</p>
             <Button
               onClick={() => handleCopyPrompt(template.prompt)}
               className="w-full bru-button gap-2"
