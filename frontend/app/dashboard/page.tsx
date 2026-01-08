@@ -246,6 +246,7 @@ export default function DashboardPage() {
             progress={progress}
             error={error}
             videoUrl={videoUrl}
+            generatedCode={generatedCode}
             handleGenerate={handleGenerate}
           />
         ) : currentView === 'history' ? (

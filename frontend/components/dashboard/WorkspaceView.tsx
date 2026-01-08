@@ -18,6 +18,7 @@ interface WorkspaceViewProps {
   progress: number
   error: string
   videoUrl: string | null
+  generatedCode: string
   handleGenerate: () => void
 }
 
@@ -34,12 +35,13 @@ export function WorkspaceView({
   progress,
   error,
   videoUrl,
+  generatedCode,
   handleGenerate,
 }: WorkspaceViewProps) {
   const [mobileTab, setMobileTab] = useState<'chat' | 'output'>('chat')
 
   return (
-    <div className="flex-1 flex flex-col md:flex-row overflow-hidden relative">
+    <div className="flex-1 flex flex-col md:flex-row overflow-hidden relative min-h-0">
       {/* Mobile Workspace Tabs */}
       <div className="md:hidden flex h-10 border-b-2 border-border bg-background">
         <button
@@ -149,7 +151,7 @@ export function WorkspaceView({
       </div>
 
       {/* Viewport Pane */}
-      <Viewport videoUrl={videoUrl} mobileTab={mobileTab} />
+      <Viewport videoUrl={videoUrl} generatedCode={generatedCode} mobileTab={mobileTab} />
     </div>
   )
 }

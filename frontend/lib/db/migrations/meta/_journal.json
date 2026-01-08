@@ -8,6 +8,20 @@
       "when": 1766241654876,
       "tag": "0000_clean_paibok",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1767225600000,
+      "tag": "0001_backfill_chats_and_videos",
+      "breakpoints": false
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1767887910328,
+      "tag": "0002_lean_smiling_tiger",
+      "breakpoints": true
     }
   ]
 }

@@ -141,6 +141,13 @@ HARD API SAFETY RULES (MANDATORY)
 - If unsure, REMOVE the argument
 - Prefer default constructors over customization
 
+API COMPATIBILITY (Manim CE 0.18 — STRICT)
+- Use Surface, not ParametricSurface
+- Use Cube(side_length=...), do NOT pass x_length/y_length/z_length
+- Do NOT use Rectangle3D or Cuboid
+- Arrow3D uses thickness, not tube_radius
+- Never call self.play(self.move_camera(...)) — call self.move_camera(...) directly and then self.wait(0.5)
+
 ====================================================
 SYNTAX SAFETY RULES
 ====================================================

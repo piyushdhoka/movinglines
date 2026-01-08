@@ -4,6 +4,7 @@ import subprocess
 import tempfile
 import shutil
 import sys
+import re
 from concurrent.futures import ThreadPoolExecutor
 
 QUALITY_FLAGS = {
@@ -41,6 +42,8 @@ async def render_animation(script: str, quality: str = "m") -> str:
     print(f"[Manim] Script path: {script_path}")
     
     try:
+        # Sanitize common LLM mistakes to match Manim CE 0.18 API
+        script = sanitize_manim_script(script)
         # Normalize indentation
         import ast, textwrap
         script_norm = script.replace("\t", "    ")
@@ -52,7 +55,7 @@ async def render_animation(script: str, quality: str = "m") -> str:
         print(f"[Manim] Script written, content:\n{script_norm[:500]}...")
         
         # Extract the scene class name from the script
-        scene_name = extract_scene_name(script)
+        scene_name = extract_scene_name(script_norm)
         print(f"[Manim] Scene name: {scene_name}")
         
         quality_flag = QUALITY_FLAGS.get(quality, "-qm")
@@ -138,3 +141,151 @@ def find_output_video(work_dir: str, scene_name: str, quality: str) -> str | Non
                     return os.path.join(root, file)
     
     return None
+
+
+# -----------------------
+# Script Sanitizer (Manim)
+# -----------------------
+def sanitize_manim_script(script: str) -> str:
+    """Apply safe, deterministic fixes for common LLM-generated Manim issues.
+
+    Rules:
+    - Ensure required imports exist
+    - Replace deprecated/unknown APIs with CE 0.18 equivalents
+    - Fix invalid keyword args on known classes
+    - Remove unsafe patterns like self.play(self.move_camera(...))
+    """
+
+    s = script or ""
+
+    # Ensure manim import is present at top
+    if "from manim import" not in s:
+        s = "from manim import *\n" + s
+
+    # If numpy is referenced, ensure it's imported
+    if "np." in s and "import numpy as np" not in s:
+        # Insert just after the manim import if present
+        lines = s.splitlines()
+        inserted = False
+        for i, line in enumerate(lines[:5]):
+            if line.strip().startswith("from manim import"):
+                lines.insert(i + 1, "import numpy as np")
+                inserted = True
+                break
+        if not inserted:
+            lines.insert(0, "import numpy as np")
+        s = "\n".join(lines)
+
+    # Replace old/unknown API names
+    # ParametricSurface is Surface in 0.18
+    s = re.sub(r"\bParametricSurface\b", "Surface", s)
+    # Rectangle3D is not a valid class; map to Cube first, then we normalize Cube args below
+    s = re.sub(r"\bRectangle3D\b", "Cube", s)
+
+    # Arrow3D had 'tube_radius' -> 'thickness' in CE
+    s = re.sub(r"(Arrow3D\s*\([^\)]*?)\btube_radius\s*=", r"\1thickness=", s, flags=re.DOTALL)
+
+    # self.play(self.move_camera(...)) -> self.move_camera(...); self.wait(0.5)
+    def _fix_move_camera(m: re.Match) -> str:
+        indent = m.group(1)
+        args = m.group(2)
+        return f"{indent}self.move_camera({args})\n{indent}self.wait(0.5)"
+
+    s = re.sub(r"(^[ \t]*)self\.play\(\s*self\.move_camera\((.*?)\)\s*\)\s*",
+               _fix_move_camera, s, flags=re.MULTILINE | re.DOTALL)
+
+    # Normalize Cube calls that incorrectly pass x_length/y_length/z_length.
+    s = _normalize_cube_dimensions(s)
+
+    return s
+
+
+def _normalize_cube_dimensions(code: str) -> str:
+    """Replace Cube(x_length=..., y_length=..., z_length=..., ...) with
+    Cube(side_length=max(...)) while preserving other kwargs.
+
+    Handles multiple Cube(...) occurrences and keeps expressions intact.
+    """
+
+    src = code
+    out = []
+    i = 0
+    while True:
+        j = src.find("Cube(", i)
+        if j == -1:
+            out.append(src[i:])
+            break
+        # Copy text before Cube(
+        out.append(src[i:j])
+        # Find balanced closing paren
+        k = j + len("Cube(")
+        depth = 1
+        while k < len(src) and depth > 0:
+            if src[k] == '(':
+                depth += 1
+            elif src[k] == ')':
+                depth -= 1
+            k += 1
+        # Arguments between j+5 and k-1
+        args_str = src[j + len("Cube("): k - 1]
+        replaced = _rewrite_cube_args(args_str)
+        out.append(f"Cube({replaced})")
+        i = k
+    return "".join(out)
+
+
+def _rewrite_cube_args(args_str: str) -> str:
+    # Extract potential x/y/z_length expressions
+    x = re.search(r"x_length\s*=\s*([^,\)]*)", args_str)
+    y = re.search(r"y_length\s*=\s*([^,\)]*)", args_str)
+    z = re.search(r"z_length\s*=\s*([^,\)]*)", args_str)
+
+    if not (x or y or z):
+        return args_str  # nothing to fix
+
+    x_expr = (x.group(1).strip() if x else None) or "0"
+    y_expr = (y.group(1).strip() if y else None) or "0"
+    z_expr = (z.group(1).strip() if z else None) or "0"
+
+    # Remove the x/y/z_length kwargs from the original args
+    # Split top-level commas only
+    parts = _split_top_level_commas(args_str)
+    kept = [p for p in parts if not re.search(r"\b[xyz]_length\s*=", p.strip())]
+
+    # Prepend side_length using max of provided dimensions
+    side = f"side_length=max({x_expr}, {y_expr}, {z_expr})"
+    new_parts = [side] + [p.strip() for p in kept if p.strip()]
+    return ", ".join(new_parts)
+
+
+def _split_top_level_commas(s: str) -> list[str]:
+    parts = []
+    buf = []
+    depth = 0
+    in_str: str | None = None
+    i = 0
+    while i < len(s):
+        ch = s[i]
+        if in_str:
+            buf.append(ch)
+            if ch == in_str and s[i-1] != '\\':
+                in_str = None
+        else:
+            if ch in ('"', "'"):
+                in_str = ch
+                buf.append(ch)
+            elif ch == '(':
+                depth += 1
+                buf.append(ch)
+            elif ch == ')':
+                depth = max(0, depth - 1)
+                buf.append(ch)
+            elif ch == ',' and depth == 0:
+                parts.append(''.join(buf).strip())
+                buf = []
+            else:
+                buf.append(ch)
+        i += 1
+    if buf:
+        parts.append(''.join(buf).strip())
+    return parts

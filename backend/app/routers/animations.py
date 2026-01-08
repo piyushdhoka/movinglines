@@ -106,6 +106,7 @@ async def generate_animation(
 
 async def process_animation(task_id: str, prompt: str, quality: str, duration: int, user_id: str):
     import traceback
+    from app.services.video_renderer import sanitize_manim_script
     try:
         print(f"[{task_id}] Starting animation generation for prompt: {prompt[:50]}...")
         
@@ -115,16 +116,18 @@ async def process_animation(task_id: str, prompt: str, quality: str, duration: i
         script = await generate_manim_script(prompt, duration)
         print(f"[{task_id}] Script generated:\n{script[:200]}...")
         
+        # Sanitize script for Manim CE 0.18 compatibility and persist what will actually render
+        script_sanitized = sanitize_manim_script(script)
         update_task_in_db(task_id, {
             "status": "rendering",
             "progress": 50,
-            "generated_script": script
+            "generated_script": script_sanitized
         })
         
         print(f"[{task_id}] Rendering animation...")
         
         try:
-            video_path = await render_animation(script, quality)
+            video_path = await render_animation(script_sanitized, quality)
             print(f"[{task_id}] Video rendered at: {video_path}")
         except RuntimeError as render_error:
             error_str = str(render_error)
@@ -143,9 +146,12 @@ async def process_animation(task_id: str, prompt: str, quality: str, duration: i
             }
             
             script = await generate_improved_code(error_context)
+            # Sanitize again and persist
+            script_sanitized = sanitize_manim_script(script)
+            update_task_in_db(task_id, {"generated_script": script_sanitized})
             
             print(f"[{task_id}] Retrying with improved code...")
-            video_path = await render_animation(script, quality)
+            video_path = await render_animation(script_sanitized, quality)
             print(f"[{task_id}] Retry successful: {video_path}")
         
         update_task_in_db(task_id, {"status": "uploading", "progress": 80})
