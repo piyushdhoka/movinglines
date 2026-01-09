@@ -14,7 +14,7 @@ QUALITY_FLAGS = {
     "k": "-qk",   # 4K60
 }
 
-executor = ThreadPoolExecutor(max_workers=7)
+executor = ThreadPoolExecutor(max_workers=2)
 
 def _run_manim_sync(cmd: str, work_dir: str) -> tuple:
     """Run manim command synchronously."""
