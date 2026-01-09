@@ -2,6 +2,7 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.messages import SystemMessage, HumanMessage
 import re
 import logging
+from app.services.video_renderer import sanitize_manim_script
 
 from app.config import get_settings
 from app.prompts.manim_prompt import MANIM_SYSTEM_PROMPT
@@ -62,6 +63,16 @@ def extract_code(text: str) -> str:
     return text.strip()
 
 
+def _strip_markdown_fences(code: str) -> str:
+    """Remove any lingering markdown code fences or language hints."""
+    if not code:
+        return code
+    # Remove triple backtick blocks and any language spec after ```
+    code = re.sub(r"```+\w*", "", code)
+    code = code.replace("```", "")
+    return code.strip()
+
+
 async def generate_manim_script(user_prompt: str, duration: int = 15) -> str:
     """Generate Manim script from user prompt using RAG."""
     logger.info(f"[LLM] Generating script for: {user_prompt[:100]}...")
@@ -102,6 +113,10 @@ async def generate_manim_script(user_prompt: str, duration: int = 15) -> str:
     result = await llm.ainvoke(messages)
 
     code = extract_code(result.content)
+    code = _strip_markdown_fences(code)
+
+    # Sanitize API compatibility before indentation fixes
+    code = sanitize_manim_script(code)
 
     # Normalize indentation first
     code = _normalize_indentation(code)
@@ -316,6 +331,8 @@ Generate corrected code:"""
     result = await llm.ainvoke(messages)
     
     code = extract_code(result.content)
+    code = _strip_markdown_fences(code)
+    code = sanitize_manim_script(code)
     code = _normalize_indentation(code)
     code = _sanitize_updaters(code)
     code = _sanitize_3d_camera(code)
