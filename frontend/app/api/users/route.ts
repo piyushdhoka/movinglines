@@ -36,10 +36,10 @@ export async function POST(request: NextRequest) {
         // User exists with same email but different auth provider
         // Just return the existing user - don't try to update the ID
         // as it would break foreign key constraints
-        return NextResponse.json({ 
-          user: existingByEmail[0], 
-          synced: false, 
-          note: 'User exists with different auth provider' 
+        return NextResponse.json({
+          user: existingByEmail[0],
+          synced: false,
+          note: 'User exists with different auth provider'
         });
       }
     }

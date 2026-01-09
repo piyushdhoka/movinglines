@@ -6,9 +6,9 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
 
-export function Hero({ onLaunch }: { onLaunch: () => void }) {
+export function Hero({ onLaunchAction }: { onLaunchAction: () => void }) {
   return (
-    <section className="relative max-w-6xl mx-auto px-4 md:px-6 pt-12 pb-8 md:pt-16 md:pb-12 lg:pt-24 lg:pb-20">
+    <section className="relative w-full px-6 md:px-12 pt-12 pb-8 md:pt-16 md:pb-12 lg:pt-24 lg:pb-20">
       <div className="inline-flex items-center gap-2 md:gap-3 bru-badge mb-4 md:mb-6 text-xs md:text-sm">
         <span className="inline-flex h-2 w-2 md:h-3 md:w-3 rounded-full bg-destructive" />
         EARLY ACCESS
@@ -24,7 +24,7 @@ export function Hero({ onLaunch }: { onLaunch: () => void }) {
           </p>
 
           <div className="flex flex-wrap gap-3">
-            <Button className="bru-button" onClick={onLaunch}>
+            <Button className="bru-button" onClick={onLaunchAction}>
               Launch the studio <ArrowRight className="h-4 w-4" />
             </Button>
             <Button variant="outline" className="bru-ghost" asChild>

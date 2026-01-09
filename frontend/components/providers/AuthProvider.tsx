@@ -26,7 +26,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
       })
-      
+
       if (!response.ok) {
         console.error('Failed to sync user to database')
       }
@@ -47,7 +47,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (mounted) {
           setSession(session)
           setUser(session?.user ?? null)
-          
+
           // Sync user to database if logged in
           if (session?.user) {
             await syncUserToDatabase()
@@ -66,7 +66,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (mounted) {
         setSession(session)
         setUser(session?.user ?? null)
-        
+
         // Sync user to database on auth state change
         if (session?.user) {
           await syncUserToDatabase()
@@ -92,12 +92,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signUp = async (email: string, password: string) => {
     try {
-      const { data, error } = await supabase.auth.signUp({ email, password })
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
+        },
+      })
       if (error) throw error
-      
+
       // Check if email confirmation is required
       const requiresConfirmation = !data.session
-      
+
       return { requiresConfirmation }
     } catch (error) {
       console.error('Sign up error:', error)

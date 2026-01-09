@@ -38,7 +38,7 @@ const socialLinks = [
 export function Footer() {
   return (
     <footer className="border-t-2 border-border bg-secondary-background mt-8 md:mt-12 lg:mt-16">
-      <div className="max-w-6xl mx-auto px-4 md:px-6 py-8 md:py-12">
+      <div className="w-full px-6 md:px-12 py-8 md:py-12">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-6 mb-8">
           {/* Brand Section */}
           <div className="flex flex-col gap-4">
@@ -62,7 +62,7 @@ export function Footer() {
             <div className="flex flex-col gap-2">
               <Link href="/features" className="text-sm font-semibold hover:text-main transition-colors">Features</Link>
               <Link href="/showcase" className="text-sm font-semibold hover:text-main transition-colors">Showcase</Link>
-              <Link href="/api/docs" className="text-sm font-semibold hover:text-main transition-colors">Documentation</Link>
+              <Link href="http://localhost:8000/docs" className="text-sm font-semibold hover:text-main transition-colors">Documentation</Link>
               <a href="https://github.com/piyushdhoka/movinglines" target="_blank" rel="noreferrer" className="text-sm font-semibold hover:text-main transition-colors">GitHub</a>
             </div>
           </div>
