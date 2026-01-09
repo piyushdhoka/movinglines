@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/components/providers/AuthProvider'
+import { useAuthModal } from '@/hooks/use-auth-modal'
 import { AuthModal } from '@/components/AuthModal'
 import { Header } from '@/components/landing/Header'
 import { Hero } from '@/components/landing/Hero'
@@ -12,15 +13,15 @@ import { Cta } from '@/components/landing/Cta'
 import { Footer } from '@/components/landing/Footer'
 
 export default function LandingPage() {
-  const [showAuth, setShowAuth] = useState(false)
   const router = useRouter()
   const { user, loading } = useAuth()
+  const { open: openAuthModal } = useAuthModal()
 
   const onLaunch = () => {
     if (user) {
       router.push('/dashboard')
     } else {
-      setShowAuth(true)
+      openAuthModal()
     }
   }
 
@@ -49,7 +50,7 @@ export default function LandingPage() {
 
       <Footer />
 
-      {showAuth && <AuthModal onCloseAction={() => setShowAuth(false)} />}
+      <AuthModal />
     </div>
   )
 }

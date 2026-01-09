@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { GeistSans } from 'geist/font/sans'
 import './globals.css'
 import { AuthProvider } from '@/components/providers/AuthProvider'
+import { AuthModalProvider } from '@/hooks/use-auth-modal'
 import { ErrorBoundary } from '@/components/providers/ErrorBoundary'
 import { SponsorButton } from '@/components/SponsorButton'
 
@@ -23,8 +24,10 @@ export default function RootLayout({
       <body className={`${GeistSans.variable} font-sans bg-background text-foreground antialiased`}>
         <ErrorBoundary>
           <AuthProvider>
-            {children}
-            <SponsorButton />
+            <AuthModalProvider>
+              {children}
+              <SponsorButton />
+            </AuthModalProvider>
           </AuthProvider>
         </ErrorBoundary>
       </body>
