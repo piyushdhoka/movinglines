@@ -29,6 +29,7 @@ interface Chat {
   created_at: string;
 }
 
+
 export default function DashboardPage() {
   const { user, session, loading } = useAuth();
   const router = useRouter();
@@ -37,6 +38,8 @@ export default function DashboardPage() {
   // Chat State
   const [chats, setChats] = useState<Chat[]>([]);
   const [activeChatId, setActiveChatId] = useState<string | null>(null);
+  const [chatsLoading, setChatsLoading] = useState(false);
+  const [chatsError, setChatsError] = useState<string | null>(null);
 
   // Generation State
   const [prompt, setPrompt] = useState('');
@@ -66,11 +69,16 @@ export default function DashboardPage() {
 
   const loadChats = async () => {
     if (!session?.access_token) return;
+    setChatsLoading(true);
+    setChatsError(null);
     try {
       const data = await getChats(session.access_token);
       setChats(data);
-    } catch (err) {
-      console.error('Failed to load chats:', err);
+    } catch (err: any) {
+      setChatsError(err?.message || 'Failed to load chats');
+      setChats([]);
+    } finally {
+      setChatsLoading(false);
     }
   };
 
@@ -196,11 +204,22 @@ export default function DashboardPage() {
     setIsGenerating(false);
   };
 
+
   if (loading) return <div className="h-screen bg-background flex items-center justify-center"><Loader2 className="animate-spin" /></div>;
   if (!user) return null;
 
+  // Show chat loading/error state above sidebar
+  const chatStatus = (
+    <>
+      {chatsLoading && <div className="text-xs text-muted-foreground px-4 py-2">Loading chats...</div>}
+      {chatsError && <div className="text-xs text-destructive px-4 py-2">{chatsError}</div>}
+    </>
+  );
+
   return (
     <SidebarProvider>
+      {/* Show chat loading/error above sidebar */}
+      {chatStatus}
       <AppSidebar
         currentView={currentView}
         setCurrentView={setCurrentView}
