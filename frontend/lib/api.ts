@@ -188,9 +188,9 @@ export async function cancelAnimation(taskId: string, token: string) {
   }
 }
 
-export function getWebSocketURL(clientId: string) {
+export function getWebSocketURL(clientId: string, token: string) {
   const url = new URL(API_URL)
   const protocol = url.protocol === 'https:' ? 'wss:' : 'ws:'
-  return `${protocol}//${url.host}/api/animations/ws/${clientId}`
+  return `${protocol}//${url.host}/api/animations/ws/${clientId}?token=${token}`
 }
 

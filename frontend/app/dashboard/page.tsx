@@ -146,7 +146,7 @@ export default function DashboardPage() {
   useEffect(() => {
     if (!user?.id || !session?.access_token) return;
 
-    const wsUrl = getWebSocketURL(user.id);
+    const wsUrl = getWebSocketURL(user.id, session.access_token);
     const socket = new WebSocket(wsUrl);
 
     socket.onopen = () => {
