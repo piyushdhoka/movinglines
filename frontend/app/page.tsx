@@ -25,15 +25,11 @@ export default function LandingPage() {
     }
   }
 
-  useEffect(() => {
-    if (user && !loading) {
-      router.push('/dashboard')
-    }
-  }, [user, loading, router])
+
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <Header onLaunch={onLaunch} />
+      <Header onLaunchAction={onLaunch} />
 
       <main className="relative overflow-hidden">
         <div className="pointer-events-none absolute inset-0 opacity-40">
@@ -42,10 +38,10 @@ export default function LandingPage() {
           <div className="absolute top-1/3 left-1/3 h-52 w-52 border-4 border-dashed border-border rotate-6" />
         </div>
 
-        <Hero onLaunch={onLaunch} />
+        <Hero onLaunchAction={onLaunch} />
         <Features />
         <Showcase />
-        <Cta onLaunch={onLaunch} />
+        <Cta onLaunchAction={onLaunch} />
       </main>
 
       <Footer />

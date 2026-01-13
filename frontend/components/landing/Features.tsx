@@ -30,7 +30,7 @@ const features = [
 
 export function Features() {
   return (
-    <section id="features" className="max-w-6xl mx-auto px-4 md:px-6 py-12 md:py-16 space-y-6 md:space-y-8">
+    <section id="features" className="w-full px-6 md:px-12 py-12 md:py-16 space-y-6 md:space-y-8">
       <div className="flex items-center justify-between gap-3 md:gap-4 flex-wrap">
         <div>
           <p className="bru-badge text-xs md:text-sm">Capabilities</p>
@@ -41,7 +41,7 @@ export function Features() {
         </Button>
       </div>
 
-      <div className="grid sm:grid-cols-2 gap-4 md:gap-6">
+      <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
         {features.map((feature) => (
           <Card key={feature.title} className="bru-card h-full">
             <CardHeader className="pb-2 flex flex-row items-center gap-2 md:gap-3">

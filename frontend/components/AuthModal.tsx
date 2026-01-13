@@ -72,8 +72,8 @@ export function AuthModal() {
   // Loading overlay for Google redirect
   if (googleLoading) {
     return (
-      <Dialog open={isOpen} onOpenChange={() => {}}>
-        <DialogContent className="sm:max-w-md border-0 bg-white p-0 overflow-hidden shadow-2xl">
+      <Dialog open={isOpen} onOpenChange={() => { }}>
+        <DialogContent className="sm:max-w-md border-2 border-black bg-white p-0 overflow-hidden bru-shadow">
           <DialogTitle className="sr-only">Signing in with Google</DialogTitle>
           <DialogDescription className="sr-only">Please wait while we redirect you to Google</DialogDescription>
           <div className="p-12 flex flex-col items-center justify-center min-h-[400px] space-y-6">
@@ -103,7 +103,7 @@ export function AuthModal() {
   if (confirmationSent) {
     return (
       <Dialog open={isOpen} onOpenChange={close}>
-        <DialogContent className="sm:max-w-md border-0 bg-white p-0 overflow-hidden shadow-2xl">
+        <DialogContent className="sm:max-w-md border-2 border-black bg-white p-0 overflow-hidden bru-shadow">
           <DialogTitle className="sr-only">Email Confirmation</DialogTitle>
           <DialogDescription className="sr-only">Check your email for confirmation link</DialogDescription>
           <div className="p-8 md:p-10">
@@ -131,7 +131,7 @@ export function AuthModal() {
                   setError('')
                 }}
                 variant="outline"
-                className="w-full h-11"
+                className="w-full h-12 border-2 border-black font-bold uppercase tracking-tight bru-shadow hover:bg-black/5"
               >
                 Back to Sign In
               </Button>
@@ -144,14 +144,14 @@ export function AuthModal() {
 
   return (
     <Dialog open={isOpen} onOpenChange={close}>
-      <DialogContent className="sm:max-w-md border-4 border-black bg-white p-0 overflow-hidden bru-shadow">
+      <DialogContent className="sm:max-w-md border-2 border-black bg-white p-0 overflow-hidden bru-shadow">
         <DialogTitle className="sr-only">{isSignUp ? 'Create account' : 'Welcome back'}</DialogTitle>
         <DialogDescription className="sr-only">{isSignUp ? 'Start creating amazing animations' : 'Continue your creative journey'}</DialogDescription>
         <div className="p-8 md:p-10 space-y-6">
           {/* Header */}
           <div className="text-center space-y-3">
-            <div className="inline-flex items-center justify-center w-14 h-14 border-4 border-black bg-yellow-300">
-              <Sparkles className="h-7 w-7 text-black" />
+            <div className="inline-flex items-center justify-center w-14 h-14 border-2 border-black bg-primary">
+              <Sparkles className="h-7 w-7 text-primary-foreground" />
             </div>
             <h2 className="text-3xl font-black text-black uppercase tracking-tight">
               {isSignUp ? 'Create account' : 'Welcome back'}
@@ -166,7 +166,7 @@ export function AuthModal() {
             type="button"
             onClick={handleGoogleSignIn}
             disabled={googleLoading || loading}
-            className="w-full h-14 bg-white border-4 border-black hover:translate-x-1 hover:translate-y-1 transition-transform text-black font-bold uppercase tracking-tight bru-shadow gap-3"
+            className="w-full h-14 bg-white border-2 border-black transition-colors text-black font-bold uppercase tracking-tight bru-shadow gap-3"
           >
             <svg className="h-6 w-6" viewBox="0 0 24 24">
               <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
@@ -180,7 +180,7 @@ export function AuthModal() {
           {/* Divider */}
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t-4 border-black border-dashed" />
+              <div className="w-full border-t-2 border-black border-dashed" />
             </div>
             <div className="relative flex justify-center text-xs">
               <span className="px-4 bg-white text-black font-bold uppercase tracking-wider">
@@ -199,7 +199,7 @@ export function AuthModal() {
                   placeholder="Email address"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="pl-12 h-14 bg-white border-4 border-black bru-shadow placeholder:text-black/50 placeholder:font-semibold text-black font-semibold focus:translate-x-1 focus:translate-y-1 transition-transform"
+                  className="pl-12 h-14 bg-white border-2 border-black bru-shadow placeholder:text-black/50 placeholder:font-semibold text-black font-semibold transition-colors"
                   required
                 />
               </div>
@@ -211,7 +211,7 @@ export function AuthModal() {
                   placeholder="Password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="pl-12 h-14 bg-white border-4 border-black bru-shadow placeholder:text-black/50 placeholder:font-semibold text-black font-semibold focus:translate-x-1 focus:translate-y-1 transition-transform"
+                  className="pl-12 h-14 bg-white border-2 border-black bru-shadow placeholder:text-black/50 placeholder:font-semibold text-black font-semibold transition-colors"
                   required
                   minLength={6}
                 />
@@ -219,7 +219,7 @@ export function AuthModal() {
             </div>
 
             {error && (
-              <div className="bg-red-100 border-4 border-black text-black text-sm p-4 font-bold bru-shadow">
+              <div className="bg-red-50 border-2 border-black text-black text-sm p-4 font-bold bru-shadow">
                 {error}
               </div>
             )}
@@ -227,7 +227,7 @@ export function AuthModal() {
             <Button
               type="submit"
               disabled={loading}
-              className="w-full h-14 font-black uppercase tracking-tight bg-yellow-300 border-4 border-black hover:translate-x-1 hover:translate-y-1 text-black transition-transform bru-shadow gap-2"
+              className="w-full h-14 font-black uppercase tracking-tight bg-primary border-2 border-black text-primary-foreground transition-colors bru-shadow gap-2"
             >
               {loading ? (
                 <Loader2 className="h-5 w-5 animate-spin" />
@@ -251,7 +251,7 @@ export function AuthModal() {
                 setEmail('')
                 setPassword('')
               }}
-              className="text-black underline decoration-4 underline-offset-4 hover:decoration-yellow-300 uppercase font-black"
+              className="text-black underline decoration-2 underline-offset-4 hover:decoration-primary uppercase font-black"
             >
               {isSignUp ? 'Sign in' : 'Sign up'}
             </button>

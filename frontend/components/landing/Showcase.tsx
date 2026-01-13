@@ -23,7 +23,7 @@ const showcases = [
 
 export function Showcase() {
   return (
-    <section id="showcase" className="max-w-6xl mx-auto px-4 md:px-6 py-12 md:py-16 space-y-6 md:space-y-10">
+    <section id="showcase" className="w-full px-6 md:px-12 py-12 md:py-16 space-y-6 md:space-y-10">
       <div className="flex items-center justify-between gap-3 flex-wrap">
         <div>
           <p className="bru-badge text-xs md:text-sm">Showcase</p>
@@ -32,7 +32,7 @@ export function Showcase() {
         <Badge className="bru-badge text-xs md:text-sm">Works with Manim</Badge>
       </div>
 
-      <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
+      <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
         {showcases.map((item) => (
           <Card key={item.title} className="bru-card h-full bg-secondary">
             <CardHeader className="pb-3">

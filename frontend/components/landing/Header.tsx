@@ -15,15 +15,15 @@ import { Sheet, SheetClose, SheetContent, SheetTrigger } from '@/components/ui/s
 const navLinks = [
   { label: 'Features', href: '/features' },
   { label: 'Showcase', href: '/showcase' },
-  { label: 'Docs', href: '/api/docs' },
+  { label: 'Docs', href: 'http://localhost:8000/docs' },
 ]
 
-export function Header({ onLaunch }: { onLaunch: () => void }) {
+export function Header({ onLaunchAction }: { onLaunchAction: () => void }) {
   const { user, signOut } = useAuth()
 
   return (
-    <header className="sticky top-0 z-40 bg-background/90 backdrop-blur">
-      <div className="max-w-6xl mx-auto px-4 md:px-6 py-4 flex items-center justify-between gap-3">
+    <header className="sticky top-0 z-40 bg-background/90 backdrop-blur border-b-2 border-border">
+      <div className="w-full px-6 md:px-12 py-4 flex items-center justify-between gap-3">
         <div className="flex items-center gap-3">
           <Link href="/" className="flex items-center gap-3">
             <div className="h-11 w-11 rounded-md border-2 border-border bru-shadow bg-secondary flex items-center justify-center">
@@ -58,12 +58,12 @@ export function Header({ onLaunch }: { onLaunch: () => void }) {
               <Button variant="ghost" className="bru-ghost text-xs px-4 py-2" onClick={() => signOut()}>
                 Sign out
               </Button>
-              <Button className="bru-button text-xs" onClick={onLaunch}>
+              <Button className="bru-button text-xs" onClick={onLaunchAction}>
                 Dashboard <ArrowRight className="h-4 w-4" />
               </Button>
             </>
           ) : (
-            <Button className="bru-button text-xs" onClick={onLaunch}>
+            <Button className="bru-button text-xs" onClick={onLaunchAction}>
               Launch app <ArrowRight className="h-4 w-4" />
             </Button>
           )}
@@ -96,14 +96,21 @@ export function Header({ onLaunch }: { onLaunch: () => void }) {
             </div>
             <div className="mt-6 flex flex-col gap-3">
               {user ? (
-                <SheetClose asChild>
-                  <Button className="bru-button w-full text-sm" onClick={onLaunch}>
-                    Dashboard
-                  </Button>
-                </SheetClose>
+                <>
+                  <SheetClose asChild>
+                    <Button variant="outline" className="bru-ghost w-full text-sm" onClick={() => signOut()}>
+                      Sign out
+                    </Button>
+                  </SheetClose>
+                  <SheetClose asChild>
+                    <Button className="bru-button w-full text-sm" onClick={onLaunchAction}>
+                      Dashboard
+                    </Button>
+                  </SheetClose>
+                </>
               ) : (
                 <SheetClose asChild>
-                  <Button className="bru-button w-full text-sm" onClick={onLaunch}>
+                  <Button className="bru-button w-full text-sm" onClick={onLaunchAction}>
                     Launch app
                   </Button>
                 </SheetClose>
