@@ -23,6 +23,7 @@ import { AppSidebar } from '@/components/dashboard/AppSidebar';
 import { WorkspaceView } from '@/components/dashboard/WorkspaceView';
 import { HistoryView } from '@/components/dashboard/HistoryView';
 import { TemplatesView } from '@/components/dashboard/TemplatesView';
+import GoogleAuthLoading from '@/components/ui/GoogleAuthLoading';
 
 interface Chat {
   id: string;
@@ -311,7 +312,7 @@ export default function DashboardPage() {
   };
 
 
-  if (loading) return <div className="h-screen bg-background flex items-center justify-center"><Loader2 className="animate-spin" /></div>;
+  if (loading) return <GoogleAuthLoading />;
   if (!user) return null;
 
   return (
