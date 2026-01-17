@@ -316,7 +316,7 @@ export default function DashboardPage() {
   if (!user) return null;
 
   return (
-    <SidebarProvider>
+    <SidebarProvider defaultOpen={true}>
       <AppSidebar
         currentView={currentView}
         setCurrentView={setCurrentView}
@@ -326,11 +326,11 @@ export default function DashboardPage() {
         handleNewChat={handleNewChat}
         handleDeleteChat={handleDeleteChat}
       />
-      <SidebarInset>
-        <header className="flex h-14 shrink-0 items-center gap-2 border-b border-white/5 bg-[#0a0a0a] transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
+      <SidebarInset className="h-svh overflow-hidden">
+        <header className="sticky top-0 z-20 flex h-14 shrink-0 items-center gap-2 border-b border-white/5 bg-[#0a0a0a] transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
           <div className="flex items-center gap-2 px-4">
             <SidebarTrigger
-              className="-ml-1 text-white/50 hover:text-white"
+              className="-ml-1 h-8 w-8 text-white hover:bg-white/10 hover:text-white"
               aria-label="Toggle sidebar"
               title="Toggle sidebar"
             />
