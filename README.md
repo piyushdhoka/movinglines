@@ -5,7 +5,7 @@
   
   **The ultimate AI-powered Manim animation generator.**
   
-  [![Next.js](https://img.shields.io/badge/Next.js-15-black?style=for-the-badge&logo=next.js)](https://nextjs.org/)
+  [![Next.js](https://img.shields.io/badge/Next.js-16-black?style=for-the-badge&logo=next.js)](https://nextjs.org/)
   [![FastAPI](https://img.shields.io/badge/FastAPI-0.100+-05998b?style=for-the-badge&logo=fastapi)](https://fastapi.tiangolo.com/)
   [![Manim](https://img.shields.io/badge/Manim-Community-2e2e2e?style=for-the-badge&logo=python)](https://www.manim.community/)
   [![Gemini](https://img.shields.io/badge/Google-Gemini%201.5%20Pro-4285F4?style=for-the-badge&logo=google-gemini)](https://aistudio.google.com/)
@@ -30,7 +30,7 @@
 ## 🛠️ Tech Stack
 
 ### Frontend
-- **Framework**: [Next.js 15](https://nextjs.org/) (App Router)
+- **Framework**: [Next.js 16](https://nextjs.org/) (App Router)
 - **Styling**: [Tailwind CSS](https://tailwindcss.com/) & [Framer Motion](https://www.framer.com/motion/)
 - **ORM**: [Drizzle ORM](https://orm.drizzle.team/)
 - **Auth & Storage**: [Supabase](https://supabase.com/)
