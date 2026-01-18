@@ -23,7 +23,7 @@ class ConnectionManager:
     def set_sio(self, sio):
         self.sio = sio
 
-    async def broadcast_status(self, user_id: str, task_id: str, status: str, progress: int, video_url: str = None, chat_id: str = None, error: str = None):
+    async def broadcast_status(self, user_id: str, task_id: str, status: str, progress: int, video_url: str = None, chat_id: str = None, generated_script: str = None, error: str = None):
         if not self.sio:
             return
             
@@ -33,6 +33,7 @@ class ConnectionManager:
             "progress": progress,
             "video_url": video_url,
             "chat_id": chat_id,
+            "generated_script": generated_script,
             "error": error
         }
         
@@ -196,7 +197,7 @@ async def process_animation(task_id: str, prompt: str, quality: str, duration: i
             "progress": 50,
             "generated_script": script_sanitized
         })
-        await manager.broadcast_status(user_id, task_id, "rendering", 50)
+        await manager.broadcast_status(user_id, task_id, "rendering", 50, generated_script=script_sanitized)
         
         print(f"[{task_id}] Rendering animation...")
         
@@ -220,7 +221,7 @@ async def process_animation(task_id: str, prompt: str, quality: str, duration: i
             # Sanitize again and persist
             script_sanitized = sanitize_manim_script(script)
             update_task_in_db(task_id, {"generated_script": script_sanitized})
-            await manager.broadcast_status(user_id, task_id, "rendering", 55) # Slight progress bump for retry
+            await manager.broadcast_status(user_id, task_id, "rendering", 55, generated_script=script_sanitized) # Slight progress bump for retry
             
             print(f"[{task_id}] Retrying with improved code...")
             video_path = await render_animation(script_sanitized, quality)
@@ -238,7 +239,7 @@ async def process_animation(task_id: str, prompt: str, quality: str, duration: i
             "progress": 100,
             "video_url": video_url
         })
-        await manager.broadcast_status(user_id, task_id, "completed", 100, video_url=video_url)
+        await manager.broadcast_status(user_id, task_id, "completed", 100, video_url=video_url, generated_script=script_sanitized)
         
     except Exception as e:
         error_msg = f"{str(e)}\n{traceback.format_exc()}"

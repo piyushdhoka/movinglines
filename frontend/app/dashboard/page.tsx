@@ -190,6 +190,7 @@ export default function DashboardPage() {
 
       setStatus(data.status);
       if (data.progress !== undefined) setProgress(data.progress);
+      if (data.generated_script) setGeneratedCode(data.generated_script);
 
       if (data.status === 'completed') {
         handleTaskCompletion(data);
@@ -248,7 +249,8 @@ export default function DashboardPage() {
           // Only update if it's still for the current task
           if (taskIdRef.current === taskId) {
             setStatus(task.status);
-            setProgress(task.progress || 0);
+            if (task.progress !== undefined) setProgress(task.progress || 0);
+            if (task.generated_script) setGeneratedCode(task.generated_script);
 
             if (task.status === 'completed') {
               setTaskId(null);
@@ -327,7 +329,7 @@ export default function DashboardPage() {
         handleDeleteChat={handleDeleteChat}
       />
       <SidebarInset className="h-svh overflow-hidden">
-       <header className="sticky top-0 z-20 flex h-14 shrink-0 items-center gap-2 border-b border-white/5 bg-[#0a0a0a] transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
+        <header className="sticky top-0 z-20 flex h-14 shrink-0 items-center gap-2 border-b border-white/5 bg-[#0a0a0a] transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
           <div className="flex items-center gap-2 px-4">
             <SidebarTrigger
               className="-ml-1 h-8 w-8 text-white hover:bg-white/10 hover:text-white"
