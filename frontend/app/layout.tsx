@@ -1,4 +1,5 @@
 export { metadataConfig as metadata } from './meta'
+import { Analytics } from '@vercel/analytics/next'
 import { GeistSans } from 'geist/font/sans'
 import './globals.css'
 import { AuthProvider } from '@/components/providers/AuthProvider'
@@ -22,6 +23,7 @@ export default function RootLayout({
             </AuthModalProvider>
           </AuthProvider>
         </ErrorBoundary>
+        <Analytics />
       </body>
     </html>
   )
