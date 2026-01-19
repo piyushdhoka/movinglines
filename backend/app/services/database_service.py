@@ -69,6 +69,7 @@ async def ensure_user_exists(user_id: str, email: str = None) -> bool:
         client.table("users").insert({
             "id": user_id,
             "email": safe_email,
+            "credits": 2,  # Default free credits for new users
             "created_at": datetime.utcnow().isoformat(),
             "updated_at": datetime.utcnow().isoformat()
         }).execute()
@@ -78,6 +79,50 @@ async def ensure_user_exists(user_id: str, email: str = None) -> bool:
         print(f"[Supabase] User sync failed: {e}")
         # Return False to indicate failure - caller should handle this
         return False
+
+
+def get_user_credits(user_id: str) -> int:
+    """Get the current credit balance for a user."""
+    client = get_supabase()
+    result = client.table("users").select("credits").eq("id", user_id).single().execute()
+    if result.data:
+        return result.data.get("credits", 0)
+    return 0
+
+
+def deduct_credit(user_id: str) -> bool:
+    """
+    Atomically deduct 1 credit from user using conditional UPDATE.
+    Uses WHERE credits > 0 to prevent negative credits and race conditions.
+    Returns True if successful, False if no credits available.
+    """
+    client = get_supabase()
+    
+    try:
+        # Use Supabase's RPC to run an atomic UPDATE that only succeeds if credits > 0
+        # This is a single SQL statement that cannot be raced
+        result = client.rpc('deduct_user_credit', {'p_user_id': user_id}).execute()
+        
+        # RPC returns the number of affected rows (1 if deducted, 0 if no credits)
+        if result.data and result.data > 0:
+            return True
+        return False
+    except Exception as e:
+        # Fallback: if RPC doesn't exist, use conditional update
+        print(f"[Credits] RPC failed, using fallback: {e}")
+        
+        # Get current credits first
+        current = get_user_credits(user_id)
+        if current <= 0:
+            return False
+        
+        # Update with WHERE condition to prevent concurrent double-spend
+        result = client.table("users").update({
+            "credits": current - 1,
+            "updated_at": datetime.utcnow().isoformat()
+        }).eq("id", user_id).gte("credits", current).execute()
+        
+        return bool(result.data and len(result.data) > 0)
 
 
 async def upload_video(video_path: str, user_id: str, prompt: str) -> str:

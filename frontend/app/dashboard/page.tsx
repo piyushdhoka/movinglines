@@ -5,7 +5,7 @@ import { io } from 'socket.io-client';
 import { Loader2 } from 'lucide-react';
 import { useAuth } from '@/components/providers/AuthProvider';
 import { useRouter } from 'next/navigation';
-import { generateAnimation, getTaskStatus, getChats, deleteChat, getChatHistory, Quality, getSocketURL } from '@/lib/api';
+import { generateAnimation, getTaskStatus, getChats, deleteChat, getChatHistory, Quality, getSocketURL, getUserCredits } from '@/lib/api';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -57,6 +57,9 @@ export default function DashboardPage() {
   const [generatedCode, setGeneratedCode] = useState<string>('');
   const [isGenerating, setIsGenerating] = useState(false);
 
+  // Credit State
+  const [credits, setCredits] = useState<number | null>(null);
+
   // Auth Check
   useEffect(() => {
     if (!loading && !user) {
@@ -64,12 +67,23 @@ export default function DashboardPage() {
     }
   }, [user, loading, router]);
 
-  // Fetch Chats
+  // Fetch Chats and Credits
   useEffect(() => {
     if (session?.access_token) {
       loadChats();
+      loadCredits();
     }
   }, [session?.access_token]);
+
+  const loadCredits = async () => {
+    if (!session?.access_token) return;
+    try {
+      const data = await getUserCredits(session.access_token);
+      setCredits(data.credits);
+    } catch (err) {
+      console.error('Failed to load credits:', err);
+    }
+  };
 
   const loadChats = async () => {
     if (!session?.access_token) return;
@@ -219,6 +233,7 @@ export default function DashboardPage() {
       if (data.video_url) setVideoUrl(data.video_url);
       if (data.generated_script) setGeneratedCode(data.generated_script);
       loadChats();
+      loadCredits(); // Refresh credit count after generation
     };
 
     const handleTaskFailure = (data: any) => {
@@ -329,8 +344,8 @@ export default function DashboardPage() {
         handleDeleteChat={handleDeleteChat}
       />
       <SidebarInset className="h-svh overflow-hidden">
-        <header className="sticky top-0 z-20 flex h-14 shrink-0 items-center gap-2 border-b border-white/5 bg-[#0a0a0a] transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
-          <div className="flex items-center gap-2 px-4">
+        <header className="sticky top-0 z-20 flex h-14 shrink-0 items-center justify-between gap-2 border-b border-white/5 bg-[#0a0a0a] transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12 px-4">
+          <div className="flex items-center gap-2">
             <SidebarTrigger
               className="-ml-1 h-8 w-8 text-white hover:bg-white/10 hover:text-white"
               aria-label="Toggle sidebar"
@@ -338,12 +353,12 @@ export default function DashboardPage() {
             />
             <Breadcrumb>
               <BreadcrumbList>
-                <BreadcrumbItem className="hidden md:block">
+                <BreadcrumbItem className="hidden sm:block">
                   <BreadcrumbLink href="/dashboard" className="text-sm text-white/50 hover:text-white">
                     Dashboard
                   </BreadcrumbLink>
                 </BreadcrumbItem>
-                <BreadcrumbSeparator className="hidden md:block text-white/20" />
+                <BreadcrumbSeparator className="hidden sm:block text-white/20" />
                 <BreadcrumbItem>
                   <BreadcrumbPage className="text-sm font-medium text-white">
                     {currentView === 'workspace' ? 'Create' : currentView === 'templates' ? 'Templates' : 'History'}
@@ -352,6 +367,23 @@ export default function DashboardPage() {
               </BreadcrumbList>
             </Breadcrumb>
           </div>
+
+          {/* Credit Progress Bar in Header */}
+          {credits !== null && (
+            <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2">
+                <span className={`text-xs font-medium ${credits > 0 ? 'text-green-400' : 'text-red-400'}`}>
+                  {credits}/2 credits
+                </span>
+                <div className="w-16 h-1.5 bg-white/10 rounded-full overflow-hidden">
+                  <div
+                    className={`h-full transition-all duration-500 ${credits === 0 ? 'bg-red-500' : 'bg-green-500'}`}
+                    style={{ width: `${(credits / 2) * 100}%` }}
+                  />
+                </div>
+              </div>
+            </div>
+          )}
         </header>
 
         {currentView === 'workspace' ? (
@@ -370,6 +402,7 @@ export default function DashboardPage() {
             videoUrl={videoUrl}
             generatedCode={generatedCode}
             handleGenerate={handleGenerate}
+            credits={credits}
           />
         ) : currentView === 'history' ? (
           <HistoryView />

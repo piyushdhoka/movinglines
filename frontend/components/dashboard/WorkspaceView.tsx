@@ -1,9 +1,16 @@
 'use client'
 
 import { useState } from 'react'
-import { ArrowUp } from 'lucide-react'
+import { ArrowUp, Plus, ChevronDown } from 'lucide-react'
 import { Quality } from '@/lib/api'
 import { Viewport } from './Viewport'
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButton,
+  InputGroupText,
+  InputGroupTextarea,
+} from '@/components/ui/input-group'
 
 interface WorkspaceViewProps {
   activeChatId: string | null
@@ -20,6 +27,7 @@ interface WorkspaceViewProps {
   videoUrl: string | null
   generatedCode: string
   handleGenerate: () => void
+  credits: number | null
 }
 
 export function WorkspaceView({
@@ -37,8 +45,11 @@ export function WorkspaceView({
   videoUrl,
   generatedCode,
   handleGenerate,
+  credits,
 }: WorkspaceViewProps) {
   const [mobileTab, setMobileTab] = useState<'chat' | 'output'>('chat')
+
+  const [activeDropdown, setActiveDropdown] = useState<'duration' | 'quality' | null>(null)
 
   const qualityOptions: { value: Quality; label: string }[] = [
     { value: 'l', label: '480p' },
@@ -50,11 +61,11 @@ export function WorkspaceView({
   const durationOptions = [15, 30, 45]
 
   return (
-    <div className="flex-1 flex flex-col md:flex-row overflow-hidden relative min-h-0 bg-[#0a0a0a]">
+    <div className="flex-1 flex flex-col md:flex-row overflow-hidden relative min-h-0 bg-[#0a0a0a]" onClick={() => setActiveDropdown(null)}>
       {/* Mobile Tabs */}
       <div className="md:hidden flex h-12 border-b border-white/5 bg-[#0a0a0a]">
         <button
-          onClick={() => setMobileTab('chat')}
+          onClick={(e) => { e.stopPropagation(); setMobileTab('chat'); }}
           className={`flex-1 text-sm font-medium transition-colors ${mobileTab === 'chat'
             ? 'text-white border-b-2 border-white'
             : 'text-white/40'
@@ -63,7 +74,7 @@ export function WorkspaceView({
           Create
         </button>
         <button
-          onClick={() => setMobileTab('output')}
+          onClick={(e) => { e.stopPropagation(); setMobileTab('output'); }}
           className={`flex-1 text-sm font-medium transition-colors ${mobileTab === 'output'
             ? 'text-white border-b-2 border-white'
             : 'text-white/40'
@@ -78,6 +89,7 @@ export function WorkspaceView({
 
         {/* Status Area */}
         <div className="flex-1 p-6 overflow-y-auto">
+          {/* ... existing content ... */}
           {/* Empty state - show when not generating, no video, no error */}
           {!isGenerating && !error && !videoUrl && (
             <div className="h-full flex items-center justify-center">
@@ -125,54 +137,11 @@ export function WorkspaceView({
           )}
         </div>
 
-        {/* Controls */}
-        <div className="p-5 border-t border-white/5 space-y-5">
-          {/* Settings Row */}
-          <div className="flex items-center gap-6">
-            {/* Duration */}
-            <div className="space-y-2">
-              <label className="text-xs font-medium text-white/40">Duration</label>
-              <div className="flex gap-1 p-1 rounded-lg bg-white/5">
-                {durationOptions.map((d) => (
-                  <button
-                    key={d}
-                    onClick={() => setDuration(d)}
-                    disabled={isGenerating}
-                    className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all ${duration === d
-                      ? 'bg-white text-black'
-                      : 'text-white/50 hover:text-white hover:bg-white/10'
-                      } ${isGenerating ? 'opacity-50 cursor-not-allowed' : ''}`}
-                  >
-                    {d}s
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Quality */}
-            <div className="space-y-2">
-              <label className="text-xs font-medium text-white/40">Quality</label>
-              <div className="flex gap-1 p-1 rounded-lg bg-white/5">
-                {qualityOptions.map((q) => (
-                  <button
-                    key={q.value}
-                    onClick={() => setQuality(q.value)}
-                    disabled={isGenerating}
-                    className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all ${quality === q.value
-                      ? 'bg-white text-black'
-                      : 'text-white/50 hover:text-white hover:bg-white/10'
-                      } ${isGenerating ? 'opacity-50 cursor-not-allowed' : ''}`}
-                  >
-                    {q.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          {/* Input Area */}
-          <div className="relative">
+        {/* Controls - Integrated into InputGroup */}
+        <div className="p-5 border-t border-white/5">
+          <InputGroup className="flex-col">
             <textarea
+              data-slot="input-group-control"
               id="animation-prompt"
               name="prompt"
               value={prompt}
@@ -186,18 +155,90 @@ export function WorkspaceView({
               placeholder="Describe your animation..."
               aria-label="Animation description"
               disabled={isGenerating}
-              className={`w-full p-4 pr-14 rounded-xl border border-white/10 bg-white/5 text-white text-sm placeholder:text-white/30 focus:border-white/20 focus:ring-0 outline-none resize-none h-28 transition-colors ${isGenerating ? 'opacity-50' : ''}`}
+              className={`w-full min-h-20 resize-none bg-transparent px-4 pt-4 pb-14 text-sm text-white placeholder:text-white/30 outline-none ${isGenerating ? 'opacity-50' : ''}`}
             />
-            <button
-              onClick={handleGenerate}
-              disabled={isGenerating || !prompt.trim()}
-              aria-label="Generate animation"
-              title="Generate animation"
-              className="absolute bottom-4 right-4 w-10 h-10 rounded-lg bg-white text-black flex items-center justify-center disabled:opacity-30 disabled:cursor-not-allowed hover:bg-white/90 transition-colors"
-            >
-              <ArrowUp className="h-5 w-5" aria-hidden="true" />
-            </button>
-          </div>
+            <InputGroupAddon align="block-end">
+              {/* Left side - Duration & Quality Dropdowns */}
+              <div className="flex items-center gap-2">
+                {/* Duration Dropdown */}
+                <div className="relative">
+                  <InputGroupButton
+                    className="gap-1"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setActiveDropdown(activeDropdown === 'duration' ? null : 'duration');
+                    }}
+                  >
+                    {duration}s
+                    <ChevronDown className={`h-3 w-3 transition-transform ${activeDropdown === 'duration' ? 'rotate-180' : ''}`} />
+                  </InputGroupButton>
+                  {activeDropdown === 'duration' && (
+                    <div className="absolute bottom-full left-0 mb-2 flex flex-col gap-1 p-1.5 rounded-lg bg-[#1a1a1a] border border-white/10 shadow-xl z-50">
+                      {durationOptions.map((d) => (
+                        <button
+                          key={d}
+                          onClick={(e) => { e.stopPropagation(); setDuration(d); setActiveDropdown(null); }}
+                          disabled={isGenerating}
+                          className={`px-3 py-1.5 rounded-md text-xs font-medium whitespace-nowrap transition-all ${duration === d
+                            ? 'bg-white text-black'
+                            : 'text-white/70 hover:text-white hover:bg-white/10'
+                            }`}
+                        >
+                          {d} seconds
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                {/* Quality Dropdown */}
+                <div className="relative">
+                  <InputGroupButton
+                    className="gap-1"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setActiveDropdown(activeDropdown === 'quality' ? null : 'quality');
+                    }}
+                  >
+                    {qualityOptions.find(q => q.value === quality)?.label || '720p'}
+                    <ChevronDown className={`h-3 w-3 transition-transform ${activeDropdown === 'quality' ? 'rotate-180' : ''}`} />
+                  </InputGroupButton>
+                  {activeDropdown === 'quality' && (
+                    <div className="absolute bottom-full left-0 mb-2 flex flex-col gap-1 p-1.5 rounded-lg bg-[#1a1a1a] border border-white/10 shadow-xl z-50">
+                      {qualityOptions.map((q) => (
+                        <button
+                          key={q.value}
+                          onClick={(e) => { e.stopPropagation(); setQuality(q.value); setActiveDropdown(null); }}
+                          disabled={isGenerating}
+                          className={`px-3 py-1.5 rounded-md text-xs font-medium whitespace-nowrap transition-all ${quality === q.value
+                            ? 'bg-white text-black'
+                            : 'text-white/70 hover:text-white hover:bg-white/10'
+                            }`}
+                        >
+                          {q.label}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+              {/* Right side - Credits & Send */}
+              <div className="flex items-center gap-3">
+                <InputGroupText>
+                  {credits !== null ? `${credits}/2 credits` : ''}
+                </InputGroupText>
+                <InputGroupButton
+                  variant="default"
+                  size="icon-sm"
+                  onClick={handleGenerate}
+                  disabled={isGenerating || !prompt.trim() || credits === 0}
+                  aria-label="Generate animation"
+                  title={credits === 0 ? 'No credits remaining' : 'Generate animation'}
+                >
+                  <ArrowUp className="h-4 w-4" />
+                </InputGroupButton>
+              </div>
+            </InputGroupAddon>
+          </InputGroup>
         </div>
       </div>
 

@@ -8,7 +8,7 @@ import asyncio
 
 from app.services.code_generator import generate_manim_script, generate_improved_code
 from app.services.video_renderer import render_animation
-from app.services.database_service import upload_video, get_user_videos, get_current_user, get_supabase, create_chat_in_db, get_user_chats_from_db, delete_chat_from_db, get_chat_tasks_from_db, ensure_user_exists
+from app.services.database_service import upload_video, get_user_videos, get_current_user, get_supabase, create_chat_in_db, get_user_chats_from_db, delete_chat_from_db, get_chat_tasks_from_db, ensure_user_exists, get_user_credits, deduct_credit
 
 import logging
 logger = logging.getLogger(__name__)
@@ -135,6 +135,13 @@ async def get_chat_history(chat_id: str, user_identity: tuple[str, str] = Depend
     user_id, _ = user_identity
     return get_chat_tasks_from_db(chat_id, user_id)
 
+@router.get("/credits")
+async def get_credits(user_identity: tuple[str, str] = Depends(get_current_user)):
+    """Get current credit balance for the user"""
+    user_id, _ = user_identity
+    credits = get_user_credits(user_id)
+    return {"credits": credits}
+
 @router.post("/generate", response_model=AnimationResponse)
 async def generate_animation(
     request: AnimationRequest,
@@ -148,6 +155,11 @@ async def generate_animation(
     success = await ensure_user_exists(user_id, email)
     if not success:
         raise HTTPException(status_code=500, detail="Failed to synchronize user record. Please contact support.")
+    
+    # Check if user has credits
+    credits = get_user_credits(user_id)
+    if credits <= 0:
+        raise HTTPException(status_code=402, detail="No credits remaining. Please upgrade your plan to continue generating animations.")
     
     task_id = str(uuid.uuid4())
     
@@ -233,6 +245,10 @@ async def process_animation(task_id: str, prompt: str, quality: str, duration: i
         print(f"[{task_id}] Uploading to Supabase...")
         video_url = await upload_video(video_path, user_id, prompt)
         print(f"[{task_id}] Upload complete: {video_url}")
+        
+        # Deduct credit after successful generation
+        deduct_credit(user_id)
+        print(f"[{task_id}] Credit deducted for user {user_id}")
         
         update_task_in_db(task_id, {
             "status": "completed",

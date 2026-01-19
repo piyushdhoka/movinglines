@@ -43,19 +43,16 @@ export function Hero({ onLaunchAction }: { onLaunchAction: () => void }) {
         </h1>
 
         {/* Category Badges */}
-        <p className="text-base text-white/50">
-          The best way to build{' '}
-          {categories.map((cat, i) => (
-            <span key={cat.label}>
-              <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium text-black ${cat.color}`}>
-                {cat.label}
-                {cat.icon && <span>{cat.icon}</span>}
-              </span>
-              {i < categories.length - 1 && <span className="text-white/30">, </span>}
+        <div className="flex flex-wrap items-center justify-center gap-2 text-base text-white/50 max-w-2xl">
+          <span className="whitespace-nowrap">The best way to build</span>
+          {categories.map((cat) => (
+            <span key={cat.label} className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium text-black ${cat.color}`}>
+              {cat.label}
+              {cat.icon && <span>{cat.icon}</span>}
             </span>
           ))}
-          {' '}with AI
-        </p>
+          <span className="whitespace-nowrap">with AI</span>
+        </div>
 
         {/* Central Prompt Input */}
         <form onSubmit={handleSubmit} className="w-full max-w-2xl mt-8">
@@ -73,20 +70,20 @@ export function Hero({ onLaunchAction }: { onLaunchAction: () => void }) {
             </div>
 
             {/* Input Controls */}
-            <div className="flex items-center justify-between px-4 py-3 border-t border-white/5">
-              <div className="flex items-center gap-2">
-                <button type="button" className="flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-white/10 bg-white/5 text-white/70 text-xs font-medium hover:border-white/20 transition-colors">
+            <div className="flex flex-col sm:flex-row items-center justify-between px-4 py-3 border-t border-white/5 gap-4">
+              <div className="flex items-center gap-2 w-full sm:w-auto">
+                <button type="button" className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-md border border-white/10 bg-white/5 text-white/70 text-xs font-medium hover:border-white/20 transition-colors">
                   <Settings2 className="h-3.5 w-3.5" />
                   Auto
                   <ChevronDown className="h-3 w-3" />
                 </button>
-                <button type="button" className="flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-white/10 bg-white/5 text-white/70 text-xs font-medium hover:border-white/20 transition-colors">
+                <button type="button" className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-md border border-white/10 bg-white/5 text-white/70 text-xs font-medium hover:border-white/20 transition-colors">
                   <Settings2 className="h-3.5 w-3.5" />
                   Tools
                   <ChevronDown className="h-3 w-3" />
                 </button>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center justify-end gap-2 w-full sm:w-auto">
                 <button
                   type="button"
                   className="p-2 rounded-md text-white/30 hover:text-white/60 transition-colors"

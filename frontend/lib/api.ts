@@ -84,7 +84,11 @@ export async function getUserVideos(token: string) {
   })
 }
 
-
+export async function getUserCredits(token: string) {
+  return fetchWithRetry(`${API_URL}/api/animations/credits`, {
+    headers: { 'Authorization': `Bearer ${token}` }
+  })
+}
 
 export async function getVideos(limit = 1000, offset = 0, scope?: 'all') {
   try {

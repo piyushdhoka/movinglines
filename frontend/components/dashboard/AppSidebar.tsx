@@ -14,6 +14,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  useSidebar,
 } from '@/components/ui/sidebar'
 import {
   DropdownMenu,
@@ -48,6 +49,15 @@ export function AppSidebar({
   handleDeleteChat,
 }: AppSidebarProps) {
   const { user, signOut } = useAuth()
+  const { isMobile, setOpenMobile } = useSidebar()
+
+  // Helper to handle clicks that should close mobile sidebar
+  const handleMobileClick = (action: () => void) => {
+    action()
+    if (isMobile) {
+      setOpenMobile(false)
+    }
+  }
 
   // Get user avatar from Google
   const userAvatar = user?.user_metadata?.avatar_url || user?.user_metadata?.picture
@@ -75,7 +85,7 @@ export function AppSidebar({
         {/* New Animation Button */}
         <SidebarGroup className="pt-4 pb-2 shrink-0 group-data-[state=collapsed]:p-1">
           <button
-            onClick={handleNewChat}
+            onClick={() => handleMobileClick(handleNewChat)}
             className="w-full flex items-center justify-center gap-2 h-11 rounded-lg bg-white text-black text-sm font-medium hover:bg-white/90 transition-all group-data-[state=collapsed]:h-10 group-data-[state=collapsed]:gap-0"
             title="New Animation"
           >
@@ -94,7 +104,7 @@ export function AppSidebar({
               {navItems.map((item) => (
                 <SidebarMenuItem key={item.view}>
                   <button
-                    onClick={() => setCurrentView(item.view)}
+                    onClick={() => handleMobileClick(() => setCurrentView(item.view))}
                     className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all group-data-[state=collapsed]:px-0 group-data-[state=collapsed]:justify-center ${currentView === item.view
                       ? 'text-white bg-white/10'
                       : 'text-white/50 hover:text-white hover:bg-white/5'
@@ -133,10 +143,10 @@ export function AppSidebar({
                   <SidebarMenuItem key={chat.id}>
                     <div className="group flex items-center w-full">
                       <button
-                        onClick={() => {
+                        onClick={() => handleMobileClick(() => {
                           setActiveChatId(chat.id)
                           setCurrentView('workspace')
-                        }}
+                        })}
                         className={`flex-1 text-left px-3 py-2 rounded-lg text-sm truncate transition-colors ${activeChatId === chat.id
                           ? 'text-white bg-white/10'
                           : 'text-white/50 hover:text-white hover:bg-white/5'

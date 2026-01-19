@@ -4,11 +4,12 @@ import { useState } from 'react'
 import { useAuth } from '@/components/providers/AuthProvider'
 import { useAuthModal } from '@/hooks/use-auth-modal'
 import { supabase } from '@/lib/supabase'
-import { Mail, Lock, Loader2, ArrowRight, CheckCircle2, Sparkles } from 'lucide-react'
+import { Mail, Lock, Loader2, ArrowRight, CheckCircle2 } from 'lucide-react'
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import GoogleAuthLoading from '@/components/ui/GoogleAuthLoading'
+import Image from 'next/image'
 
 export function AuthModal() {
   const { isOpen, close } = useAuthModal()
@@ -125,8 +126,8 @@ export function AuthModal() {
         <div className="p-8 md:p-10 space-y-8">
           {/* Header */}
           <div className="text-center space-y-4">
-            <div className="inline-flex items-center justify-center w-12 h-12 rounded-xs bg-white mx-auto">
-              <Sparkles className="h-6 w-6 text-black" />
+            <div className="inline-flex items-center justify-center w-12 h-12 rounded-xs bg-black overflow-hidden mx-auto">
+              <Image src="/logo.png" alt="MovingLines" width={48} height={48} className="w-full h-full object-cover" />
             </div>
             <div className="space-y-1">
               <h2 className="text-2xl font-medium text-white/90 tracking-tight">

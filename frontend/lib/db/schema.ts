@@ -5,6 +5,7 @@ import { relations } from 'drizzle-orm'
 export const users = pgTable('users', {
   id: uuid('id').primaryKey(), // References auth.users(id)
   email: text('email').notNull().unique(),
+  credits: integer('credits').notNull().default(2), // Free credits for new users
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 }, (table) => ({
@@ -15,22 +16,22 @@ export const users = pgTable('users', {
 export const videos = pgTable('videos', {
   id: uuid('id').primaryKey().defaultRandom(),
   userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
-  
+
   // Video metadata
   prompt: text('prompt').notNull(),
   videoUrl: text('video_url').notNull(), // Full Supabase storage URL
   bucketPath: text('bucket_path').notNull(), // e.g., "{user_id}/{video_id}.mp4"
-  
+
   // Generation details
   quality: text('quality', { enum: ['l', 'm', 'h', 'k'] }).notNull().default('m'),
   duration: integer('duration'), // Video duration in seconds
   fileSize: integer('file_size'), // File size in bytes
-  
+
   // Status tracking
   status: text('status', { enum: ['processing', 'completed', 'failed'] }).notNull().default('completed'),
   generatedScript: text('generated_script'), // The Manim code generated
   errorMessage: text('error_message'), // If generation failed
-  
+
   // Timestamps
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
@@ -43,19 +44,19 @@ export const videos = pgTable('videos', {
 
 export const userStats = pgTable('user_stats', {
   userId: uuid('user_id').primaryKey().references(() => users.id, { onDelete: 'cascade' }),
-  
+
   // Video counts
   totalVideos: integer('total_videos').notNull().default(0),
   completedVideos: integer('completed_videos').notNull().default(0),
   failedVideos: integer('failed_videos').notNull().default(0),
-  
+
   // Storage usage
   totalStorageBytes: integer('total_storage_bytes').notNull().default(0), // Sum of all video file sizes
-  
+
   // Activity tracking
   lastVideoCreatedAt: timestamp('last_video_created_at'),
   firstVideoCreatedAt: timestamp('first_video_created_at'),
-  
+
   // Timestamps
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 }, (table) => ({
