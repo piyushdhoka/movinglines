@@ -5,6 +5,7 @@ import { AuthProvider } from '@/components/providers/AuthProvider'
 import { AuthModalProvider } from '@/hooks/use-auth-modal'
 import { ErrorBoundary } from '@/components/providers/ErrorBoundary'
 import { SponsorButton } from '@/components/SponsorButton'
+import { SpeedInsights } from '@vercel/speed-insights/next'
 
 export default function RootLayout({
   children,
@@ -19,6 +20,7 @@ export default function RootLayout({
             <AuthModalProvider>
               {children}
               <SponsorButton />
+              <SpeedInsights />
             </AuthModalProvider>
           </AuthProvider>
         </ErrorBoundary>
