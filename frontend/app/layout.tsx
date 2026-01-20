@@ -7,6 +7,7 @@ import { AuthProvider } from '@/components/providers/AuthProvider'
 import { AuthModalProvider } from '@/hooks/use-auth-modal'
 import { ErrorBoundary } from '@/components/providers/ErrorBoundary'
 import { SponsorButton } from '@/components/SponsorButton'
+import { StructuredData } from '@/components/StructuredData'
 
 export default function RootLayout({
   children,
@@ -15,6 +16,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        <StructuredData />
+      </head>
       <body className={`${GeistSans.variable} font-sans bg-background text-foreground antialiased`} suppressHydrationWarning>
         <ErrorBoundary>
           <AuthProvider>
@@ -30,4 +34,3 @@ export default function RootLayout({
     </html>
   )
 }
-
