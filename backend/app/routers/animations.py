@@ -6,7 +6,7 @@ from datetime import datetime
 import json
 import asyncio
 
-from app.services.code_generator import generate_manim_script, generate_improved_code
+from app.services.manim import generate_manim_script, generate_improved_code
 from app.services.video_renderer import render_animation
 from app.services.database_service import upload_video, get_user_videos, get_current_user, get_supabase, create_chat_in_db, get_user_chats_from_db, delete_chat_from_db, get_chat_tasks_from_db, ensure_user_exists, get_user_credits, deduct_credit
 
@@ -300,18 +300,18 @@ async def process_animation(task_id: str, prompt: str, quality: str, duration: i
         error_msg = f"{str(e)}\n{traceback.format_exc()}"
         print(f"[{task_id}] ERROR: {error_msg}")
         
-        # Better error messages for common issues
-        user_message = str(e)
-        if "ConnectError" in error_msg or "ReadError" in error_msg:
-            user_message = "Network error: Unable to reach AI service. This may be a temporary connectivity issue. Please try again."
-        elif "TimeoutError" in error_msg:
-            user_message = "Request timed out. The AI service took too long to respond. Please try again."
+        # UI-friendly error message
+        friendly_error = "Animation failed to render. Please try refining your prompt or try again."
+        
+        # Adjust message for connectivity issues
+        if "ConnectError" in error_msg or "ReadError" in error_msg or "TimeoutError" in error_msg:
+            friendly_error = "Service connection issue. Please try again in a few moments."
         
         update_task_in_db(task_id, {
             "status": "failed",
-            "error_message": user_message
+            "error_message": friendly_error
         })
-        await manager.broadcast_status(user_id, task_id, "failed", 0, error=user_message)
+        await manager.broadcast_status(user_id, task_id, "failed", 0, error=friendly_error)
     finally:
         # Cleanup
         print(f"[{task_id}] Processing complete")

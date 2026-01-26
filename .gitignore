@@ -28,6 +28,10 @@ build/
 *.swo
 .cursor/
 
+.agent/
+.agents/
+.gemini/
+.github/skills/
 # OS
 .DS_Store
 Thumbs.db
