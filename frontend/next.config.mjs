@@ -2,7 +2,8 @@ import { createMDX } from 'fumadocs-mdx/next';
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-    output: 'standalone',
+    // Disabled standalone output on Windows to avoid 'EPERM' symlink errors
+    // output: 'standalone',
     images: {
         remotePatterns: [
             {

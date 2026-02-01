@@ -42,7 +42,7 @@
     "next": "16.0.10",
     "plyr": "^3.8.4",
     "plyr-react": "^6.0.0",
-    "postgres": "^3.4.7",
+    "postgres": "3.4.8",
     "prism-react-renderer": "^2.4.1",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
