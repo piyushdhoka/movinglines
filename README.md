@@ -3,156 +3,127 @@
 
   # 🎬 MovingLines
   
-  **The ultimate AI-powered Manim animation generator.**
+  **The ultimate "Aha!" moment generator. Transform complex math into cinematic 3Blue1Brown-style animations.**
   
   [![Next.js](https://img.shields.io/badge/Next.js-16-black?style=for-the-badge&logo=next.js)](https://nextjs.org/)
   [![FastAPI](https://img.shields.io/badge/FastAPI-0.100+-05998b?style=for-the-badge&logo=fastapi)](https://fastapi.tiangolo.com/)
   [![Manim](https://img.shields.io/badge/Manim-Community-2e2e2e?style=for-the-badge&logo=python)](https://www.manim.community/)
-  [![MIT License](https://img.shields.io/badge/License-MIT-green.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
+  [![Gemini](https://img.shields.io/badge/AI-Gemini%202.0%20Flash-blue?style=for-the-badge)](https://deepmind.google/technologies/gemini/)
 
-  MovingLines transforms your text prompts into beautiful, mathematical animations using Manim and Google Gemini. Experience the power of RAG-enhanced animation scripts.
+  MovingLines isn't just a code generator; it's a **Narrative Designer**. It uses an agentic workflow to storyboard, plan, and render mathematically beautiful animations that prioritize visual continuity and educational clarity.
 </div>
 
 ---
 
-## ✨ Features
+## 🏛️ System Architecture
 
-- 🧠 **AI-Powered Scripting**: Leverages Google Gemini 1.5 Pro to write precise Manim code.
-- 📚 **RAG Integration**: Optimized with Pinecone vector database for high-quality Manim examples.
-- ⚡ **Real-time Generation**: Watch your animations come to life with a modern, responsive UI.
-- 🎥 **Quality Controls**: Choose from 480p up to 4K cinematic quality.
-- ☁️ **Cloud Storage**: Seamlessly sync your animations with Supabase.
-- 🐳 **Docker Ready**: Easy deployment with containerized services.
+MovingLines employs a multi-agent "Phased Generation" strategy to ensure high-quality output.
+
+```mermaid
+graph TD
+    User([User]) -->|Prompt| FE[Next.js Frontend]
+    FE -->|API Request| BE[FastAPI Backend]
+    
+    subgraph AI_Engine [The 'Aha!' Engine]
+        BE -->|Goal Identification| PL[Narrative Planner]
+        PL -->|Storyboard & Pacing| GEN[Manim Code Generator]
+        BE -->|Semantic Search| RAG[Pinecone RAG]
+        RAG -->|Relevant Examples| GEN
+        GEN -->|Raw Script| SAN[Sanitizer Engine]
+        SAN -->|Anti-Crash Optimization| SAN
+    end
+    
+    subgraph Rendering_Layer [Execution]
+        SAN -->|Hardened Code| REN[Manim Renderer]
+        REN -->|Video MP4| STO[Supabase Storage]
+    end
+    
+    STO -->|CDN URL| FE
+    BE -->|Chat History & Meta| DB[Supabase DB]
+    DB <--> FE
+```
+
+---
+
+## 🎨 3B1B Style Principles (Injected in Every Script)
+
+Our AI Agent follows strict cinematic guidelines inspired by Grant Sanderson's work:
+
+- 🌊 **Progressive Revelation**: Content is built step-by-step; never dumped all at once.
+- 🔄 **Visual Continuity**: Objects morph (`ReplacementTransform`) rather than just fading out.
+- 🧘 **Breathing Room**: Automatic `self.wait(2)` inserted after major realizations.
+- 🧼 **Clean Canvas Policy**: Screens are proactively cleared to prevent visual clutter and text overlaps.
+- 📏 **Legibility**: Large fonts, high-contrast colors, and "safe zone" centering for mobile-friendly viewing.
 
 ---
 
 ## 🛠️ Tech Stack
 
 ### Frontend
-- **Framework**: [Next.js 16](https://nextjs.org/) (App Router)
-- **Styling**: [Tailwind CSS](https://tailwindcss.com/) & [Framer Motion](https://www.framer.com/motion/)
-- **ORM**: [Drizzle ORM](https://orm.drizzle.team/)
-- **Auth & Storage**: [Supabase](https://supabase.com/)
+- **Framework**: Next.js 16 (App Router)
+- **State**: React Server Components & Streaming
+- **Animations**: Framer Motion
+- **Database Access**: Drizzle ORM
 
 ### Backend
-- **API Framework**: [FastAPI](https://fastapi.tiangolo.com/)
-- **Engine**: [Manim Community Edition](https://www.manim.community/)
-- **AI Orchestration**: [LangChain](https://www.langchain.com/)
-- **Vector DB**: [Pinecone](https://www.pinecone.io/) (via RAG)
+- **Framework**: FastAPI
+- **Mathematics**: Manim Community Edition
+- **Intelligence**: Google Gemini 1.5 Pro (via LangChain)
+- **Memory**: Pinecone Vector DB (RAG)
+- **Real-time**: Socket.IO for live rendering status
 
 ---
 
-## � Quick Start
+## 🚀 Quick Start
 
-### 🐳 Option 1: Docker (Easiest)
+### 🐳 Docker Deployment
+```bash
+# 1. Configure environment
+cp env.example .env
 
-1. **Clone & Enter**:
-   ```bash
-   git clone https://github.com/piyushdhoka/movinglines.git
-   cd movinglines
-   ```
+# 2. Build and run
+docker-compose up --build
+```
 
-2. **Configure Environment**:
-   ```bash
-   cp env.example .env
-   # Edit .env with your API keys
-   ```
+### 💻 Local Development
 
-3. **Launch**:
-   ```bash
-   docker-compose up --build
-   ```
-
----
-
-### � Option 2: Manual Setup (Development)
-
-#### Prerequisites
-- Python 3.10+
-- Node.js 18+
-- [FFmpeg](https://ffmpeg.org/download.html) (Required for Manim)
-
-#### 1. Backend Setup
+#### Backend
 ```bash
 cd backend
 python -m venv venv
-source venv/bin/activate # Windows: .\venv\Scripts\activate
+source venv/bin/activate
 pip install -r requirements.txt
-cp .env.example .env
-# Seed Pinecone
-python -m scripts.seed_pinecone
+python -m uvicorn app.main:app --reload
 ```
 
-#### 2. Frontend Setup
+#### Frontend
 ```bash
 cd frontend
-npm install
-cp .env.example .env.local
-# Run migrations
-npm run db:migrate
-```
-
-#### 3. Run Development Servers
-- **Backend**: `python -m uvicorn app.main:app --reload --port 8000`
-- **Frontend**: `npm run dev`
-
----
-
-## 📂 Project Structure
-
-```mermaid
-graph TD
-    A[MovingLines] --> B[Frontend - Next.js]
-    A --> C[Backend - FastAPI]
-    C --> D[Manim Engine]
-    C --> E[Gemini API]
-    C --> F[Pinecone - RAG]
-    B --> G[Supabase Auth/DB]
-```
-
-```text
-movinglines/
-├── backend/            # FastAPI, Manim logic, AI prompts
-├── frontend/           # Next.js UI, Drizzle schema, Supabase client
-├── docker-compose.yml  # Orchestration
-└── README.md           # This file
+bun install
+bun run dev
 ```
 
 ---
 
-## 🎬 Video Quality Options
+## 🧠 The Sanitization Engine
 
-| Quality | Resolution | FPS | Best For |
-|---------|------------|-----|----------|
-| `l` | 480p | 15 | Quick Previews |
-| `m` | 720p | 30 | Standard Sharing |
-| `h` | 1080p | 60 | High Definition |
-| `k` | 4K | 60 | Cinematic Output |
+One of the core strengths of MovingLines is its **Anti-Crash Layer**. It automatically detects and fixes:
+- ✅ **Vector-Scalar Mismatches**: halluncinated `set_x(RIGHT)` calls.
+- ✅ **API Hallucinations**: invalid parameters like `at_arg` or legacy `add_tip` syntax.
+- ✅ **Indentation Shifts**: Ensures AI-generated code never triggers Python syntax errors.
+- ✅ **Missing Imports**: Auto-injects common Manim components if forgotten by the LLM.
 
 ---
 
 ## 🤝 Contributing
 
-Contributions make the open source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
+We welcome contributions to the Narrative Planner or additional Manim examples for our RAG database! 
 
-1. Fork the Project
-2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the Branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+1. Fork the repo.
+2. Create your branch (`feature/AmazingFeature`).
+3. Push and open a PR.
 
 ---
-
-## 📄 License
-
-Distributed under the MIT License. See `LICENSE` for more information.
-
----
-
-## � Star History
-
-[![Star History Chart](https://api.star-history.com/svg?repos=piyushdhoka/movinglines&type=date&legend=top-left)](https://www.star-history.com/#piyushdhoka/movinglines&type=date&legend=top-left)
-
 <div align="center">
-  Made with ❤️ by Piyush Dhoka
+  Made with ❤️ for the Math & Motion Community
 </div>
