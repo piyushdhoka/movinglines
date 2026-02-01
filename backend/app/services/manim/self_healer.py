@@ -105,19 +105,29 @@ Generate corrected code:"""
                     break
         
         if inject_index:
-            # Auto-inject ImageMobject with smart prompt extraction
+            # Detect existing indentation level of the anchor line (or the line above it)
+            anchor_line = lines[inject_index - 1]
+            base_indent = len(anchor_line) - len(anchor_line.lstrip())
+            indent_prefix = ' ' * base_indent
+            
+            # Auto-inject ImageMobject with smart prompt extraction and correct indentation
             prompt_snippet = prompt[:60] if len(prompt) < 60 else prompt[:57] + "..."
-            image_code = f'''
-        # Auto-injected ImageMobject (self-healer)
-        main_img = ImageMobject("{{{{IMAGE:{prompt_snippet}}}}}")
-        main_img.scale_to_fit_height(5)
-        main_img.move_to(ORIGIN)
-        self.play(FadeIn(main_img, run_time=1))
-        self.wait(1)
-'''
-            lines.insert(inject_index, image_code)
+            
+            image_code_lines = [
+                f"{indent_prefix}# Auto-injected ImageMobject (self-healer)",
+                f"{indent_prefix}main_img = ImageMobject(\"{{{{IMAGE:{prompt_snippet}}}}}\")",
+                f"{indent_prefix}main_img.scale_to_fit_height(5)",
+                f"{indent_prefix}main_img.move_to(ORIGIN)",
+                f"{indent_prefix}self.play(FadeIn(main_img, run_time=1))",
+                f"{indent_prefix}self.wait(1)"
+            ]
+            
+            # Insert lines in reverse to maintain correct insertion point
+            for line in reversed(image_code_lines):
+                lines.insert(inject_index, line)
+                
             code = '\n'.join(lines)
-            logger.info("[Self-Healer] ImageMobject successfully auto-injected")
+            logger.info("[Self-Healer] ImageMobject successfully auto-injected with context-aware indentation")
     
     logger.info(f"[LLM] Improved code generated ({len(code)} chars)")
     

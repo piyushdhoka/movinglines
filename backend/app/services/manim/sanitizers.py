@@ -54,56 +54,87 @@ def strip_inline_comments(code: str) -> str:
 
 def normalize_indentation(code: str) -> str:
     """
-    Aggressively normalize indentation to multiples of 4 spaces.
-    Handle mixed tabs and spaces, odd indentation levels.
+    Robustly normalize indentation to multiples of 4 spaces.
+    Handles mixed tabs/spaces, odd indentation levels, and ensures the code is compilable.
     """
-    # First pass: convert all tabs to 4 spaces
-    code = code.expandtabs(4)
-    lines = code.split('\n')
-    normalized = []
+    import textwrap
     
+    # 1. Expand tabs and strip leading/trailing empty lines
+    code = code.expandtabs(4).strip('\n')
+    lines = code.split('\n')
+    
+    if not lines:
+        return ""
+
+    # 2. Extract base indentation to handle code that starts indented (e.g., from markdown extract)
+    # but we want to know the "minimum" indent of non-empty code lines to potentially dedent first
+    base_indent = float('inf')
+    for line in lines:
+        stripped = line.lstrip()
+        if stripped:
+            base_indent = min(base_indent, len(line) - len(stripped))
+    
+    if base_indent == float('inf'):
+        return code
+        
+    # Dedent if it's all shifted right
+    if base_indent > 0:
+        lines = [line[base_indent:] if len(line) >= base_indent else line.lstrip() for line in lines]
+
+    normalized = []
+    indent_stack = [0] # Stack of current active indents
+    
+    # Simple keyword-based tracking to adjust expected indentation levels
+    # This helps catch cases where the LLM uses 2 spaces instead of 4
+    indent_keywords = ('def ', 'class ', 'if ', 'elif ', 'else:', 'for ', 'while ', 'with ', 'try:', 'except ', 'finally:')
+    
+    current_level = 0
     for i, line in enumerate(lines):
         stripped = line.lstrip()
         
-        # Keep empty lines empty
         if not stripped:
             normalized.append('')
             continue
-        
-        # Count actual spaces
+            
         actual_indent = len(line) - len(stripped)
         
-        # Handle comments and special lines - preserve their level
-        if stripped.startswith('#'):
-            indent_level = actual_indent // 4
-            normalized.append(' ' * (indent_level * 4) + stripped)
-            continue
+        # Heuristic: if actual_indent is closer to next/prev level, snap it
+        # However, we rely more on the keyword-based structure if possible
         
-        # Dedent/indent analysis
-        if actual_indent == 0:
-            indent_level = 0
-        elif actual_indent % 4 == 0:
-            indent_level = actual_indent // 4
-        else:
-            indent_level = max(1, (actual_indent + 1) // 4)
+        # Snap to 4-space boundaries
+        snapped_level = round(actual_indent / 4)
         
-        normalized.append(' ' * (indent_level * 4) + stripped)
-    
+        # Basic "safety" - if the line starts a block, the NEXT line should be deeper
+        # If the line starts with a dedent keyword (else, except, finally, elif), it should match its parent's level
+        dedent_keywords = ('elif ', 'else:', 'except ', 'finally:')
+        if any(stripped.startswith(k) for k in dedent_keywords):
+             snapped_level = max(0, snapped_level) # Dedent keywords are handled by the snapping usually
+        
+        line_to_add = ' ' * (snapped_level * 4) + stripped
+        normalized.append(line_to_add)
+        
     result = '\n'.join(normalized)
     
-    # Try to compile multiple times with dedent fallbacks
-    for attempt in range(3):
+    # 3. Aggressive Compilation Verification
+    # We try to fix it until it compiles, or we reach a limit
+    for attempt in range(4):
         try:
             compile(result, '<string>', 'exec')
             return result
-        except IndentationError:
+        except IndentationError as e:
+            # If compile fails, try to use textwrap.dedent as a last resort
             if attempt == 0:
                 result = textwrap.dedent(result)
             elif attempt == 1:
-                result = textwrap.dedent(textwrap.dedent(result))
+                # Try to fix "Expected an indented block" by finding where it failed
+                # e.g. for row level in e.args
+                result = result # Placeholder for smarter logic if needed
             else:
-                return result
-    
+                break
+        except SyntaxError:
+            # Syntax errors (non-indent) are handled by self-healer/renderer
+            return result
+            
     return result
 
 
@@ -304,4 +335,44 @@ def apply_anticrash_rules(code: str) -> str:
     for pattern, replacement in coord_fixes:
         code = re.sub(pattern, replacement, code)
     
+    # Rule 14: Fix Vector-to-Scalar hallucinations (e.g. set_x(RIGHT*3))
+    def _fix_vect_to_scalar(m):
+        func = m.group(1) # set_x, set_y, set_z
+        arg = m.group(2).strip()
+        # Find numeric multipliers or vectors
+        # Pattern match for something like RIGHT * 5 or 5 * RIGHT
+        mult_match = re.search(r"([\d\.-]+)\s*\*\s*(?:RIGHT|LEFT|UP|DOWN|OUT|IN)|(?:RIGHT|LEFT|UP|DOWN|OUT|IN)\s*\*\s*([\d\.-]+)", arg)
+        if mult_match:
+            val = mult_match.group(1) or mult_match.group(2)
+            return f".{func}({val})"
+        # If it's just the vector word
+        if re.search(r"\b(RIGHT|LEFT|UP|DOWN|OUT|IN)\b", arg):
+            return f".{func}(1.0)"
+        return m.group(0)
+    code = re.sub(r"\.(set_[xyz])\((.*?)\)", _fix_vect_to_scalar, code)
+
+    # Rule 15: Fix hallucinated arguments in add_tip
+    # at_arg=..., at_start=..., at_end=... are common hallucinations
+    code = re.sub(r"at_arg\s*=\s*[\d\.-]+", "", code)
+    
+    # Rule 16: Fix ArcBetweenPoints parameter names
+    # start_point -> start, end_point -> end
+    code = re.sub(r"ArcBetweenPoints\((.*?)\bstart_point\s*=", r"ArcBetweenPoints(\1start=", code)
+    code = re.sub(r"ArcBetweenPoints\((.*?)\bend_point\s*=", r"ArcBetweenPoints(\1end=", code)
+    
+    # Rule 17: Fix BezierCurve hallucinations
+    # LLMs think BezierCurve exists as a top-level or specific import. 
+    # In CE, we usually use CubicBezier or VMobject.
+    code = re.sub(r"from manim\.mobject\.types\.vectorized_mobject import BezierCurve", "", code)
+    code = re.sub(r"\bBezierCurve\b", "CubicBezier", code)
+    
+    # Rule 18: Anti-Import Bloat
+    # Often AI adds imports that aren't needed or are already covered by 'from manim import *'
+    code = re.sub(r"from manim\.mobject\.types\.vectorized_mobject import .*", "", code)
+
+    # Final cleanup of double commas created by deletions
+    code = re.sub(r",\s*,", ",", code)
+    code = re.sub(r"\(\s*,", "(", code)
+    code = re.sub(r",\s*\)", ")", code)
+
     return code

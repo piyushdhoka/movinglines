@@ -16,31 +16,33 @@ fastapi_app = FastAPI(title="Manim Animation Generator", version="1.0.0")
 # Socket.IO setup
 sio = socketio.AsyncServer(
     async_mode='asgi',
-    cors_allowed_origins=[
-        "http://localhost:3000",
-        "http://127.0.0.1:3000",
-        "https://movinglines.vercel.app",
-        "https://movinglines.co.in",
-        "https://www.movinglines.co.in",
-    ],
+    cors_allowed_origins="*", # Managed by ASGI application middleware or specific for SIO
     ping_timeout=60,
     ping_interval=25,
-    logger=False,
+    logger=True, # Enable logging for debugging connectivity
     engineio_logger=False
 )
 app = socketio.ASGIApp(sio, fastapi_app)
+
+# Standardize Origins
+ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "https://movinglines.vercel.app",
+    "https://movinglines.co.in",
+    "https://www.movinglines.co.in",
+]
 
 # Global exception handler to ensure CORS headers are present even on 500 errors
 @fastapi_app.exception_handler(Exception)
 async def global_exception_handler(request, exc):
     print(f"[ERROR] Global Exception: {exc}")
-    # Extract origins from the request or use a wildcard for error state
     origin = request.headers.get("origin")
     return JSONResponse(
         status_code=500,
         content={"detail": str(exc)},
         headers={
-            "Access-Control-Allow-Origin": origin if origin else "*",
+            "Access-Control-Allow-Origin": origin if origin and origin in ALLOWED_ORIGINS else ALLOWED_ORIGINS[0],
             "Access-Control-Allow-Credentials": "true",
             "Access-Control-Allow-Methods": "*",
             "Access-Control-Allow-Headers": "*",
@@ -49,12 +51,7 @@ async def global_exception_handler(request, exc):
 
 fastapi_app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:3000",
-        "https://movinglines.vercel.app",
-        "https://movinglines.co.in",
-        "https://www.movinglines.co.in",
-    ],
+    allow_origins=ALLOWED_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

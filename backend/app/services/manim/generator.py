@@ -38,30 +38,40 @@ async def generate_manim_script(user_prompt: str, duration: int = 15, force_imag
     
     logger.info(f"[LLM] Generating script for: {user_prompt[:100]}... (force_image={force_image})")
     
-    # Step 1: Retrieve relevant examples from Pinecone
+    # Step 1: Research & Storyboarding (The "3b1b" Phase)
+    from app.services.manim.planner import plan_video_narrative
+    storyboard = await plan_video_narrative(user_prompt)
+    
+    # Log only the summary to keep logs clean
+    story_preview = storyboard.split('\n')[0][:100] + "..." if '\n' in storyboard else storyboard[:100]
+    logger.info(f"[Planner] Storyboard designed: {story_preview}")
+    print(f"[Planner] Storyboard designed: {story_preview}")
+
+    # Step 2: Retrieve relevant examples from Pinecone
     logger.info("[LLM] Querying Pinecone for relevant examples...")
     print("[LLM] Querying Pinecone for relevant examples...")
     examples = await get_relevant_examples(user_prompt, top_k=5)
     context = format_examples_for_context(examples)
-    logger.info(f"[LLM] Retrieved {len(examples)} examples for context")
-    print(f"[LLM] Retrieved {len(examples)} examples for context")
-    if examples:
-        logger.info(f"[LLM] Using Pinecone context. First example score={examples[0].get('score',0):.2f}")
-        print(f"[LLM] Using Pinecone context. First example score={examples[0].get('score',0):.2f}")
-    else:
-        logger.info("[LLM] No Pinecone examples found. Proceeding without external context.")
-        print("[LLM] No Pinecone examples found. Proceeding without external context.")
     
-    # Step 2: Build the prompt with context
+    if examples:
+        print(f"[LLM] RAG Success: Retrieved {len(examples)} examples (Top Score: {examples[0].get('score', 0):.2f})")
+    else:
+        print("[LLM] RAG: No relevant examples found in Pinecone. Proceeding with base knowledge.")
+    
+    # Step 3: Build the prompt with Storyboard + RAG Context
     llm = get_llm()
     
-    system_prompt_with_context = MANIM_SYSTEM_PROMPT.replace("{context}", context)
+    # Fill in both storyboard and RAG context
+    system_prompt_with_context = MANIM_SYSTEM_PROMPT.replace("{storyboard}", storyboard).replace("{context}", context)
     
     # Calculate duration constraints
     min_dur = max(5, duration - 2)
     max_dur = duration + 2
     
-    user_prompt_formatted = MANIM_USER_PROMPT.replace("{user_prompt}", user_prompt).replace("{min_duration}", str(min_dur)).replace("{max_duration}", str(max_dur))
+    user_prompt_formatted = MANIM_USER_PROMPT.format(
+        user_prompt=user_prompt,
+        max_duration=max_dur
+    )
     
     if force_image:
         image_instruction = """
@@ -154,19 +164,29 @@ This is a VALIDATION REQUIREMENT. Code without ImageMobject will be REJECTED.
                     break
         
         if inject_index:
-            # Auto-inject ImageMobject with smart prompt extraction
+            # Detect existing indentation level of the anchor line (or the line above it)
+            anchor_line = lines[inject_index - 1]
+            base_indent = len(anchor_line) - len(anchor_line.lstrip())
+            indent_prefix = ' ' * base_indent
+            
+            # Auto-inject ImageMobject with smart prompt extraction and correct indentation
             prompt_snippet = user_prompt[:60] if len(user_prompt) < 60 else user_prompt[:57] + "..."
-            image_code = f'''
-        # Auto-injected ImageMobject
-        main_img = ImageMobject("{{{{IMAGE:{prompt_snippet}}}}}")
-        main_img.scale_to_fit_height(5)
-        main_img.move_to(ORIGIN)
-        self.play(FadeIn(main_img, run_time=1))
-        self.wait(1)
-'''
-            lines.insert(inject_index, image_code)
+            
+            image_code_lines = [
+                f"{indent_prefix}# Auto-injected ImageMobject",
+                f"{indent_prefix}main_img = ImageMobject(\"{{{{IMAGE:{prompt_snippet}}}}}\")",
+                f"{indent_prefix}main_img.scale_to_fit_height(5)",
+                f"{indent_prefix}main_img.move_to(ORIGIN)",
+                f"{indent_prefix}self.play(FadeIn(main_img, run_time=1))",
+                f"{indent_prefix}self.wait(1)"
+            ]
+            
+            # Insert lines in reverse to maintain correct insertion point
+            for line in reversed(image_code_lines):
+                lines.insert(inject_index, line)
+                
             code = '\n'.join(lines)
-            logger.info("[LLM] ImageMobject successfully auto-injected")
+            logger.info("[LLM] ImageMobject successfully auto-injected with context-aware indentation")
 
     # Pre-render syntax validation
     try:

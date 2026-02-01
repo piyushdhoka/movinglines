@@ -45,17 +45,30 @@ export async function POST(request: NextRequest) {
     }
 
     // Create new user record
-    const [newUser] = await db
-      .insert(users)
-      .values({
-        id: user.id,
-        email: user.email || '',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      })
-      .returning();
+    try {
+      const [newUser] = await db
+        .insert(users)
+        .values({
+          id: user.id,
+          email: user.email || '',
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        })
+        .returning();
 
-    return NextResponse.json({ user: newUser, synced: true });
+      return NextResponse.json({ user: newUser, synced: true });
+    } catch (insertError: any) {
+      if (insertError.message?.includes('duplicate key')) {
+        // Concurrent request created it already
+        const finalUser = await db
+          .select()
+          .from(users)
+          .where(eq(users.id, user.id))
+          .limit(1);
+        return NextResponse.json({ user: finalUser[0], synced: false });
+      }
+      throw insertError;
+    }
   } catch (error) {
     console.error('Error syncing user:', error);
     return NextResponse.json(

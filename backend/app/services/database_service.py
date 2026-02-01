@@ -1,7 +1,7 @@
 import os
 import uuid
 import jwt
-from datetime import datetime
+from datetime import datetime, timezone
 from fastapi import HTTPException, Header
 from supabase import create_client, Client
 from dotenv import load_dotenv
@@ -46,38 +46,51 @@ async def get_current_user(authorization: str = Header(None)) -> tuple[str, str]
         raise HTTPException(status_code=401, detail=f"Invalid token: {str(e)}")
 
 async def ensure_user_exists(user_id: str, email: str = None) -> bool:
-    """Ensure user exists in public.users table, creating if necessary."""
+    """
+    Ensure user exists in public.users table, creating if necessary.
+    Uses a robust check-then-create pattern to handle race conditions.
+    """
     client = get_supabase()
     
     try:
-        # 1. Check if user exists by ID
-        result = client.table("users").select("id").eq("id", user_id).execute()
+        # 1. Check if user already exists (by ID)
+        result = client.table("users").select("id, email").eq("id", user_id).execute()
         if result.data:
             return True
         
-        # 2. User doesn't exist - create new record
-        # Use a unique email to avoid conflicts (append user_id if email already taken)
+        # 2. User missing - prepare new record
         safe_email = email or f"{user_id}@unknown.com"
         
-        # Check if email is already used
+        # 3. Handle Email Conflicts
+        # Check if this email is already taken by another user
         if email:
             email_check = client.table("users").select("id").eq("email", email).execute()
-            if email_check.data:
-                # Email is taken by different user - use a unique variant
+            if email_check.data and email_check.data[0]['id'] != user_id:
+                # Email is taken by someone else - we must use a fallback to satisfy UNIQUE
+                print(f"[Supabase] Email conflict for {email}. Using safe alternative.")
                 safe_email = f"{user_id}@user.movinglines.app"
-        
-        client.table("users").insert({
-            "id": user_id,
-            "email": safe_email,
-            "credits": 2,  # Default free credits for new users
-            "created_at": datetime.utcnow().isoformat(),
-            "updated_at": datetime.utcnow().isoformat()
-        }).execute()
-        return True
+
+        # 4. Attempt Insertion
+        # We wrapped this in a try/except because even with checks, 
+        # a concurrent request could insert the same record.
+        try:
+            client.table("users").insert({
+                "id": user_id,
+                "email": safe_email,
+                "credits": 2, 
+                "created_at": datetime.now(timezone.utc).isoformat(),
+                "updated_at": datetime.now(timezone.utc).isoformat()
+            }).execute()
+            print(f"[Supabase] New user record created: {user_id}")
+            return True
+        except Exception as insert_err:
+            # Check if it failed because it was JUST created by a concurrent request
+            if "duplicate key" in str(insert_err).lower():
+                return True
+            raise insert_err
             
     except Exception as e:
         print(f"[Supabase] User sync failed: {e}")
-        # Return False to indicate failure - caller should handle this
         return False
 
 
@@ -119,7 +132,7 @@ def deduct_credit(user_id: str) -> bool:
         # Update with WHERE condition to prevent concurrent double-spend
         result = client.table("users").update({
             "credits": current - 1,
-            "updated_at": datetime.utcnow().isoformat()
+            "updated_at": datetime.now(timezone.utc).isoformat()
         }).eq("id", user_id).gte("credits", current).execute()
         
         return bool(result.data and len(result.data) > 0)
@@ -159,7 +172,7 @@ async def upload_video(video_path: str, user_id: str, prompt: str) -> str:
         "prompt": prompt,
         "video_url": video_url,
         "bucket_path": file_name,
-        "created_at": datetime.utcnow().isoformat()
+        "created_at": datetime.now(timezone.utc).isoformat()
     }).execute()
     
     return video_url
@@ -173,8 +186,8 @@ def create_chat_in_db(user_id: str, title: str) -> str:
         "id": chat_id,
         "user_id": user_id,
         "title": title,
-        "created_at": datetime.utcnow().isoformat(),
-        "updated_at": datetime.utcnow().isoformat()
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "updated_at": datetime.now(timezone.utc).isoformat()
     }).execute()
     
     return chat_id
