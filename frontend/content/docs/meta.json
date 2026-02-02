@@ -1,6 +1,13 @@
 {
     "pages": [
         "index",
-        "getting-started"
+        "getting-started",
+        "---Core Concepts---",
+        "architecture",
+        "aha-engine",
+        "rag",
+        "sanitizers",
+        "---Advanced---",
+        "api"
     ]
 }

@@ -1,14 +1,15 @@
 import { docs } from 'fumadocs-mdx:collections/server';
 import { loader } from 'fumadocs-core/source';
-import { BookOpen, Rocket, FileText, Settings, Code, Zap } from 'lucide-react';
+import { BookOpen, Rocket, ShieldCheck, Database, Layout, Brain, Code2 } from 'lucide-react';
 
 const icons = {
     BookOpen: <BookOpen />,
     Rocket: <Rocket />,
-    FileText: <FileText />,
-    Settings: <Settings />,
-    Code: <Code />,
-    Zap: <Zap />,
+    ShieldCheck: <ShieldCheck />,
+    Database: <Database />,
+    Layout: <Layout />,
+    Brain: <Brain />,
+    Code2: <Code2 />,
 };
 
 export const source = loader({

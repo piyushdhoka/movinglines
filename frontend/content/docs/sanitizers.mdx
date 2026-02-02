@@ -1,0 +1,44 @@
+---
+title: Anti-Crash Sanitizer
+description: How we handle and fix common LLM hallucinations
+icon: ShieldCheck
+---
+
+import { Icon } from '@/components/Icon';
+
+# <Icon name="ShieldCheck" className="inline-block mr-2" /> Anti-Crash Sanitizer
+
+Even the most advanced LLMs can make small syntax mistakes when generating complex Manim code. MovingLines includes a multi-layered **Sanitization Engine** that scans and repairs code before it ever reaches the renderer.
+
+## Why do we need it?
+Manim CE is strict. A single extra comma or a mismatched vector dimension will crash the entire scene. Our sanitizer acts as a "hardened" buffer to ensure high success rates.
+
+## Core Sanitization Rules
+
+### 1. Vector-to-Scalar Fixes
+A common hallucination is passing a coordinate (Vector) into a method that expects a single float (Scalar).
+- **HALLUCINATION**: `obj.set_x(RIGHT * 3)`
+- **FIX**: `obj.set_x(3)`
+
+### 2. Method Hook Hallucinations
+LLMs often hallucinate parameters that existed in older versions of Manim or don't exist at all.
+- **`add_tip`**: Fixes invalid `at_arg` or `at_start` parameters.
+- **`ArcBetweenPoints`**: Automatically converts `start_point`/`end_point` to the correct `start`/`end`.
+- **`BezierCurve`**: Automatically converts the non-standard `BezierCurve` class to `CubicBezier`.
+
+### 3. Indentation Normalization
+The most common cause of `IndentationError` in Python. Our engine:
+- Snaps all indents to 4-space boundaries.
+- Removes mixed tabs/spaces.
+- Validates the code structure using Python's `compile()` function before finalizing.
+
+### 4. 3D Camera Protection
+Prevents crashes in `ThreeDScene` by removing invalid `.animate` calls on the camera object, which is a frequent AI mistake.
+
+## Self-Healing Loop
+If the renderer *still* fails after sanitization, MovingLines triggers a **Self-Healing Loop**:
+1. The error log is sent back to the LLM.
+2. The LLM is asked to "self-correct" based on the traceback.
+3. The new code is sanitized and re-rendered.
+
+This double-check system significantly increases the reliability of the platform.

@@ -1,0 +1,35 @@
+---
+title: RAG & Memory
+description: Leveraging Pinecone for high-quality code generation
+icon: Database
+---
+
+import { Icon } from '@/components/Icon';
+
+# <Icon name="Database" className="inline-block mr-2" /> RAG & Memory
+
+MovingLines uses **Retrieval-Augmented Generation (RAG)** to ensure that the AI has access to up-to-date, stable, and high-quality Manim code examples.
+
+## The Problem with LLMs and Manim
+Standard LLMs often lean on outdated Manim syntax or hallucinate methods because they were trained on a mix of legacy and community editions.
+
+## Our Solution: Pinecone Vector Search
+We maintain a curated database of "Golden Examples" — Manim scripts known to be bug-free and visually stunning.
+
+### How it Works:
+1. **Semantic Search**: When you enter a prompt like *"show me a rolling circle"*, we perform a vector search in **Pinecone**.
+2. **Context Injection**: The top 5 most relevant code snippets are retrieved.
+3. **Prompt Augmentation**: These snippets are injected into the Generator's system prompt as "Reference Examples."
+
+## Benefits of RAG
+- **Syntax Stability**: The AI mimics the modern syntax found in our verified examples.
+- **Visual Variety**: By including diverse examples (3D, Graphing, LaTeX), the AI learns more complex animation patterns.
+- **Improved Reliability**: Significantly reduces the number of "first-attempt" rendering failures.
+
+## Seeding the Database
+Developers can add new examples to the RAG database using our built-in utility:
+```bash
+cd backend
+python -m scripts.seed_pinecone
+```
+This script reads from a local collection of high-quality `.py` files and upserts their embeddings to Pinecone.

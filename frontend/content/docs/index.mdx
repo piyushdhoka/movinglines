@@ -4,35 +4,51 @@ description: Welcome to MovingLines documentation
 icon: BookOpen
 ---
 
-# Welcome to MovingLines
+import { Icon } from '@/components/Icon';
 
-MovingLines is an AI-powered animation generator that transforms your text prompts into beautiful mathematical animations using **Manim** and **Google Gemini**.
+# <Icon name="Video" className="inline-block mr-2" /> Welcome to MovingLines
 
-## What is MovingLines?
+MovingLines is an advanced AI orchestration platform designed to generate **mathematically beautiful**, **story-driven**, and **cinematic** animations using [Manim Community Edition](https://www.manim.community/).
 
-MovingLines combines the power of:
-- 🧠 **Google Gemini 1.5 Pro** for intelligent code generation
-- 📚 **RAG (Pinecone)** for high-quality Manim examples
-- 🎬 **Manim Community Edition** for professional animations
-- ⚡ **Real-time rendering** with live status updates
+By leveraging **Gemini 2.0 Flash** and a custom **Agentic Workflow**, MovingLines moves beyond simple code generation to become a true **Narrative Designer**.
 
-## Quick Links
+## <Icon name="Brain" className="inline-block mr-2" /> The "Aha!" Engine
 
-- [Getting Started](/docs/getting-started) - Set up your first animation
-- [API Reference](/docs/api) - Backend API documentation
-- [Quality Options](/docs/quality) - Video quality settings
+The core of MovingLines is the "Aha!" Engine — a multi-agent system that prioritizes educational clarity and visual continuity.
 
-## Features
+- **Phased Generation**: We don't just write code; we storyboard first.
+- **Progressive Revelation**: Content builds step-by-step to maximize understanding.
+- **Visual Continuity**: Smooth transitions and morphs instead of static cuts.
 
-### AI-Powered Generation
-Simply describe what you want to animate, and MovingLines generates the Manim code for you.
+## <Icon name="Layers" className="inline-block mr-2" /> Key Components
 
-### Multiple Quality Levels
-Choose from 480p previews up to 4K cinematic output.
+Explore our deep-dives into the system's architecture:
 
-### Cloud Storage
-All your animations are automatically saved to Supabase.
+### Architecture
+A high-level view of how the Frontend, Backend, AI Engine, and Renderer communicate. [Learn more](/docs/architecture)
 
-## Need Help?
+### The Narrative Planner
+Learn how we transform a single sentence prompt into a detailed cinematic storyboard. [Learn more](/docs/aha-engine)
 
-Check out our [troubleshooting guide](/docs/troubleshooting) or open an issue on [GitHub](https://github.com/piyushdhoka/movinglines).
+### RAG & Memory
+See how we use **Pinecone** to provide the AI with high-quality, stable Manim code examples. [Learn more](/docs/rag)
+
+### Anti-Crash Sanitizer
+Our specialized engine that detects and fixes LLM hallucinations before they reach the renderer. [Learn more](/docs/sanitizers)
+
+## <Icon name="Rocket" className="inline-block mr-2" /> Quick Start
+
+Ready to dive in? Head over to [Getting Started](/docs/getting-started) to set up your local environment or deploy via Docker.
+
+## <Icon name="Film" className="inline-block mr-2" /> Quality & Performance
+
+MovingLines supports a variety of rendering options to fit your workflow:
+- **480p (15fps)**: Instant previews for rapid iteration.
+- **720p/1080p**: Standard sharing and HD output.
+- **4K (60fps)**: Premium cinematic quality for final exports.
+
+---
+
+<div align="center">
+  <Icon name="Heart" className="inline-block mr-1 text-red-500" /> Made for the Math & Motion Community
+</div>

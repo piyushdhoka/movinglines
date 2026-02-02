@@ -1,0 +1,72 @@
+---
+title: API Reference
+description: Backend API endpoints for MovingLines
+icon: Code2
+---
+
+import { Icon } from '@/components/Icon';
+
+# <Icon name="Terminal" className="inline-block mr-2" /> API Reference
+
+MovingLines provides a RESTful API built with **FastAPI**. Below are the primary endpoints used by the frontend and available for public integration.
+
+## <Icon name="Film" className="inline-block mr-2" /> Animations
+
+### `POST /api/animations/generate`
+Starts the agentic generation and rendering process.
+
+**Request Body:**
+```json
+{
+  "prompt": "Explain the concept of derivatives",
+  "duration": 15,
+  "quality": "m"
+}
+```
+- `quality`: `l` (480p), `m` (720p), `h` (1080p), `k` (4K)
+
+**Response:**
+```json
+{
+  "task_id": "c49e6331-1b25-4033-839d-ee695e6a05c1",
+  "status": "processing"
+}
+```
+
+---
+
+### `GET /api/animations/status/{task_id}`
+Returns the current status of an animation task.
+
+**Response:**
+```json
+{
+  "status": "rendering",
+  "progress": 45,
+  "video_url": null
+}
+```
+
+---
+
+## <Icon name="MessageSquare" className="inline-block mr-2" /> Chat & History
+
+### `GET /api/animations/chats`
+Retrieves a list of all animation chats for the authenticated user.
+
+### `GET /api/animations/chats/{chat_id}/history`
+Retrieves the full message and video history for a specific chat.
+
+---
+
+## <Icon name="Activity" className="inline-block mr-2" /> Status Updates (Socket.IO)
+For real-time logs, the frontend connects to:
+`ws://localhost:8000/socket.io`
+
+**Events:**
+- `status_update`: Emitted after every major step (Planning, RAG, Rendering).
+- `render_log`: Streams the raw Manim CLI output.
+
+## <Icon name="Shield" className="inline-block mr-2" /> Authentication
+All requests must include a Supabase JWT in the header:
+`Authorization: Bearer <your_jwt_token>`
