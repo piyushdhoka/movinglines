@@ -3,6 +3,7 @@
 import Image from 'next/image'
 import { Plus, Wand2, BookOpen, Clock, Settings, LogOut, Trash2, ChevronDown, MoreHorizontal, Share, Pencil } from 'lucide-react'
 import { useAuth } from '@/components/providers/AuthProvider'
+import { ShareChatButton } from './ShareChatButton'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -173,10 +174,16 @@ export function AppSidebar({
                           </button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-48 bg-[#111] border-white/10 p-1">
-                          <DropdownMenuItem className="text-white/70 hover:text-white focus:bg-white/5 cursor-pointer flex items-center gap-2 py-2">
-                            <Share className="h-3.5 w-3.5" />
-                            Share
-                          </DropdownMenuItem>
+                          <div onClick={(e) => e.stopPropagation()}>
+                            <ShareChatButton
+                              chatId={chat.id}
+                              isPublic={false} // Will be populated after migration
+                              viewCount={0}
+                              onShareToggle={() => {
+                                // Optionally reload chats to refresh share status
+                              }}
+                            />
+                          </div>
                           <DropdownMenuItem className="text-white/70 hover:text-white focus:bg-white/5 cursor-pointer flex items-center gap-2 py-2">
                             <Pencil className="h-3.5 w-3.5" />
                             Rename

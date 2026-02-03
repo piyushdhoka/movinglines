@@ -286,3 +286,147 @@ async def delete_video(video_id: str, user_id: str) -> bool:
     client.table("videos").delete().eq("id", video_id).execute()
     
     return True
+
+
+# ============================================================================
+# SHARING FUNCTIONALITY
+# ============================================================================
+
+async def toggle_video_sharing(video_id: str, user_id: str, is_public: bool) -> dict:
+    """Toggle video sharing on/off. Returns updated video data."""
+    client = get_supabase()
+    
+    # Verify ownership
+    video = client.table("videos").select("*").eq("id", video_id).eq("user_id", user_id).single().execute()
+    if not video.data:
+        raise HTTPException(status_code=404, detail="Video not found")
+    
+    # Prepare update
+    updates = {
+        "is_public": is_public,
+        "updated_at": datetime.now(timezone.utc).isoformat()
+    }
+    
+    # Set sharedAt timestamp when first enabled
+    if is_public and not video.data.get("shared_at"):
+        updates["shared_at"] = datetime.now(timezone.utc).isoformat()
+    
+    # Update database
+    result = client.table("videos").update(updates).eq("id", video_id).execute()
+    
+    return result.data[0] if result.data else {}
+
+
+async def get_public_video(video_id: str) -> dict:
+    """Get public video details (no authentication required)."""
+    client = get_supabase()
+    
+    # Only return if video is public
+    result = client.table("videos").select("*").eq("id", video_id).eq("is_public", True).single().execute()
+    
+    if not result.data:
+        raise HTTPException(status_code=404, detail="Video not found or not public")
+    
+    return result.data
+
+
+async def increment_video_views(video_id: str) -> bool:
+    """Increment view count for a video."""
+    client = get_supabase()
+    
+    try:
+        # Get current view count
+        video = client.table("videos").select("view_count").eq("id", video_id).single().execute()
+        if not video.data:
+            return False
+        
+        current_views = video.data.get("view_count", 0)
+        
+        # Increment
+        client.table("videos").update({
+            "view_count": current_views + 1,
+            "updated_at": datetime.now(timezone.utc).isoformat()
+        }).eq("id", video_id).execute()
+        
+        return True
+    except Exception as e:
+        print(f"[Views] Failed to increment video views: {e}")
+        return False
+
+
+async def toggle_chat_sharing(chat_id: str, user_id: str, is_public: bool) -> dict:
+    """Toggle chat sharing on/off. Returns updated chat data."""
+    client = get_supabase()
+    
+    # Verify ownership
+    chat = client.table("chats").select("*").eq("id", chat_id).eq("user_id", user_id).single().execute()
+    if not chat.data:
+        raise HTTPException(status_code=404, detail="Chat not found")
+    
+    # Prepare update
+    updates = {
+        "is_public": is_public,
+        "updated_at": datetime.now(timezone.utc).isoformat()
+    }
+    
+    # Set sharedAt timestamp when first enabled
+    if is_public and not chat.data.get("shared_at"):
+        updates["shared_at"] = datetime.now(timezone.utc).isoformat()
+    
+    # Update database
+    result = client.table("chats").update(updates).eq("id", chat_id).execute()
+    
+    return result.data[0] if result.data else {}
+
+
+async def get_public_chat(chat_id: str) -> dict:
+    """Get public chat details (no authentication required)."""
+    client = get_supabase()
+    
+    # Only return if chat is public
+    result = client.table("chats").select("*").eq("id", chat_id).eq("is_public", True).single().execute()
+    
+    if not result.data:
+        raise HTTPException(status_code=404, detail="Chat not found or not public")
+    
+    return result.data
+
+
+async def get_public_chat_tasks(chat_id: str) -> list:
+    """Get all tasks for a public chat (no authentication required)."""
+    client = get_supabase()
+    
+    # Verify chat is public first
+    chat = client.table("chats").select("is_public").eq("id", chat_id).single().execute()
+    if not chat.data or not chat.data.get("is_public"):
+        raise HTTPException(status_code=404, detail="Chat not found or not public")
+    
+    # Fetch all tasks for this chat
+    result = client.table("tasks").select("*").eq("chat_id", chat_id).order("created_at", desc=False).execute()
+    
+    return result.data or []
+
+
+async def increment_chat_views(chat_id: str) -> bool:
+    """Increment view count for a chat."""
+    client = get_supabase()
+    
+    try:
+        # Get current view count
+        chat = client.table("chats").select("view_count").eq("id", chat_id).single().execute()
+        if not chat.data:
+            return False
+        
+        current_views = chat.data.get("view_count", 0)
+        
+        # Increment
+        client.table("chats").update({
+            "view_count": current_views + 1,
+            "updated_at": datetime.now(timezone.utc).isoformat()
+        }).eq("id", chat_id).execute()
+        
+        return True
+    except Exception as e:
+        print(f"[Views] Failed to increment chat views: {e}")
+        return False
+
