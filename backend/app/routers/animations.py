@@ -8,7 +8,12 @@ import asyncio
 
 from app.services.manim import generate_manim_script, generate_improved_code
 from app.services.video_renderer import render_animation
-from app.services.database_service import upload_video, get_user_videos, get_current_user, get_supabase, create_chat_in_db, get_user_chats_from_db, delete_chat_from_db, get_chat_tasks_from_db, ensure_user_exists, get_user_credits, deduct_credit
+from app.services.database_service import (
+    upload_video, get_user_videos, get_current_user, get_supabase,
+    create_chat_in_db, get_user_chats_from_db, delete_chat_from_db,
+    get_chat_tasks_from_db, ensure_user_exists, get_user_credits, deduct_credit,
+    toggle_video_sharing, toggle_chat_sharing
+)
 
 import logging
 logger = logging.getLogger(__name__)
@@ -339,3 +344,56 @@ async def list_videos(user_identity: tuple[str, str] = Depends(get_current_user)
         return await get_user_videos(user_id)
     except Exception as e:
         return []
+
+
+# ============================================================================
+# SHARING ENDPOINTS
+# ============================================================================
+
+class ShareRequest(BaseModel):
+    isPublic: bool
+
+
+@router.post("/videos/{video_id}/share")
+async def toggle_video_share(
+    video_id: str,
+    request: ShareRequest,
+    user_identity: tuple[str, str] = Depends(get_current_user)
+):
+    """Toggle video sharing on/off."""
+    user_id, _ = user_identity
+    try:
+        result = await toggle_video_sharing(video_id, user_id, request.isPublic)
+        return {
+            "success": True,
+            "video": result,
+            "message": f"Video {'shared' if request.isPublic else 'unshared'} successfully"
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"[Share] Error toggling video sharing: {e}")
+        raise HTTPException(status_code=500, detail="Failed to update sharing status")
+
+
+@router.post("/chats/{chat_id}/share")
+async def toggle_chat_share(
+    chat_id: str,
+    request: ShareRequest,
+    user_identity: tuple[str, str] = Depends(get_current_user)
+):
+    """Toggle chat sharing on/off."""
+    user_id, _ = user_identity
+    try:
+        result = await toggle_chat_sharing(chat_id, user_id, request.isPublic)
+        return {
+            "success": True,
+            "chat": result,
+            "message": f"Chat {'shared' if request.isPublic else 'unshared'} successfully"
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"[Share] Error toggling chat sharing: {e}")
+        raise HTTPException(status_code=500, detail="Failed to update sharing status")
+
