@@ -183,7 +183,12 @@ def sanitize_manim_script(script: str) -> str:
     s = s.replace(".width_to(", ".set_width(")
     s = s.replace(".move_to_point(", ".move_to(")
     s = s.replace(".scale_to(", ".scale(")
-    s = s.replace(".set_stroke_width(", ".set_stroke(width=") # Common mixup
+    s = s.replace(".set_stroke_width(", ".set_stroke(width=")
+    
+    # Square/Cube length fix
+    s = re.sub(r"Square\s*\(\s*length\s*=", "Square(side_length=", s)
+    s = re.sub(r"Cube\s*\(\s*length\s*=", "Cube(side_length=", s)
+    # Generic length -> side_length for Square and Cube if strictly matched
 
     # Replace old/unknown API names
     # ParametricSurface is Surface in 0.18
