@@ -1,80 +1,143 @@
-"use client";
+'use client'
 
-import React from "react";
-import { WobbleCard } from "@/components/ui/wobble-card";
-import { Sparkles, Cpu, ShieldCheck, Wand2 } from "lucide-react";
+import { motion } from 'framer-motion'
+import { Zap, GitBranch, FileJson } from 'lucide-react'
+
+const features = [
+  {
+    number: '1',
+    title: 'AI-powered Manim generation',
+    description:
+      'Leverage context-aware LLMs to generate Manim code from natural language with 98%+ accuracy, preserving mathematical precision and visual fidelity.',
+    icon: Zap,
+    iconColor: 'text-orange-400',
+    iconBg: 'bg-orange-500/10 border-orange-500/20',
+    widget: (
+      <div className="mt-6 relative">
+        <div className="bg-[#0a0a0a] border border-white/5 rounded-xl p-4 space-y-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className="h-8 w-8 rounded-lg bg-orange-500/10 border border-orange-500/20 flex items-center justify-center">
+                <Zap className="h-4 w-4 text-orange-400 fill-orange-400" />
+              </div>
+              <span className="text-[10px] text-white/30 uppercase tracking-wider font-bold">Generation Speed</span>
+            </div>
+            <span className="text-[10px] font-bold text-orange-400 bg-orange-500/10 border border-orange-500/20 px-2 py-0.5 rounded-full">10x</span>
+          </div>
+          <div className="text-2xl font-bold text-white tracking-tight">2,500+ <span className="text-sm font-normal text-white/30">lines/min</span></div>
+        </div>
+      </div>
+    ),
+  },
+  {
+    number: '2',
+    title: 'Real-time preview & iterate',
+    description:
+      'Preview your animations in real-time with hot-reload. Edit prompts, tweak parameters, and see changes instantly — no waiting for full renders.',
+    icon: GitBranch,
+    iconColor: 'text-blue-400',
+    iconBg: 'bg-blue-600/10 border-blue-600/20',
+    widget: (
+      <div className="mt-6 relative">
+        <div className="bg-[#0a0a0a] border border-white/5 rounded-xl p-4 space-y-2.5">
+          <div className="flex items-center justify-between mb-1">
+            <span className="text-xs font-bold text-white/70">Active Renders</span>
+            <span className="text-[10px] font-bold text-blue-400 bg-blue-600/10 border border-blue-600/20 px-2 py-0.5 rounded-full">2</span>
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="h-2 w-2 rounded-full bg-orange-400" />
+            <span className="text-xs text-white/50 flex-1">fourier_transform.py</span>
+            <div className="w-16 h-1.5 bg-white/5 rounded-full overflow-hidden">
+              <div className="h-full w-4/5 bg-orange-400 rounded-full" />
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="h-2 w-2 rounded-full bg-blue-400" />
+            <span className="text-xs text-white/50 flex-1">neural_network.py</span>
+            <div className="w-16 h-1.5 bg-white/5 rounded-full overflow-hidden">
+              <div className="h-full w-2/5 bg-blue-400 rounded-full" />
+            </div>
+          </div>
+        </div>
+      </div>
+    ),
+  },
+  {
+    number: '3',
+    title: 'Production-ready exports',
+    description:
+      'Export crisp 4K video assets in MP4, GIF, or individual frames. Ready for docs, presentations, social media, or interactive embeds.',
+    icon: FileJson,
+    iconColor: 'text-orange-400',
+    iconBg: 'bg-orange-500/10 border-orange-500/20',
+    widget: (
+      <div className="mt-6 relative">
+        <div className="bg-[#0a0a0a] border border-white/5 rounded-xl p-4 space-y-3">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-bold text-white/70">Export Status</span>
+            <div className="flex items-center gap-1.5">
+              <div className="h-2 w-2 rounded-full bg-orange-400" />
+              <span className="text-[10px] text-orange-400 font-medium">Ready</span>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="h-7 w-7 rounded-md bg-white/5 border border-white/10 flex items-center justify-center">
+              <FileJson className="h-3.5 w-3.5 text-white/40" />
+            </div>
+            <div className="flex-1">
+              <p className="text-[11px] text-white/60 font-medium">scene_output.mp4</p>
+              <p className="text-[10px] text-white/25">4K · 60fps · 12.4MB</p>
+            </div>
+            <span className="text-[10px] font-bold text-orange-400 bg-orange-500/10 border border-orange-500/20 px-2 py-1 rounded-lg flex items-center gap-1">
+              ✓ Exported
+            </span>
+          </div>
+        </div>
+      </div>
+    ),
+  },
+]
 
 export function Features() {
   return (
-    <section id="features" className="w-full px-6 py-24 md:py-32 bg-black relative overflow-hidden">
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-px bg-linear-to-r from-transparent via-white/10 to-transparent" />
-
+    <section id="features" className="w-full px-6 py-20 md:py-28 bg-black relative">
       <div className="max-w-7xl mx-auto space-y-16">
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
-          <div className="space-y-4">
-            <p className="text-[11px] font-medium tracking-[0.2em] text-blue-400 uppercase">Capabilities</p>
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-medium tracking-tight text-white/90">
-              Built for precision, <br />designed for the vibe.
-            </h2>
-          </div>
+        <div className="space-y-4 max-w-2xl">
+          <p className="text-[11px] font-bold tracking-[0.3em] text-orange-400/60 uppercase">Capabilities</p>
+          <h2 className="text-4xl md:text-5xl font-bold tracking-tight text-white">
+            Built for precision, <br />
+            <span className="text-white/30">designed for creators.</span>
+          </h2>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 w-full">
-          <WobbleCard
-            containerClassName="col-span-1 lg:col-span-2 h-full bg-blue-900 min-h-[500px] lg:min-h-[300px]"
-          >
-            <div className="max-w-xs">
-              <div className="h-10 w-10 rounded-lg bg-white/10 flex items-center justify-center mb-4">
-                <Sparkles className="h-5 w-5 text-white/70" />
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+          {features.map((feature, index) => (
+            <motion.div
+              key={feature.title}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: index * 0.1 }}
+              className="group relative p-7 rounded-2xl bg-[#0f0f0f] border border-white/5 hover:border-white/10 transition-all flex flex-col"
+            >
+              {/* Number Badge */}
+              <div className="w-9 h-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-sm font-bold text-white/40 mb-6">
+                {feature.number}
               </div>
-              <h2 className="text-left text-balance text-base md:text-xl lg:text-3xl font-semibold tracking-[-0.015em] text-white">
-                Prompt-first creation
-              </h2>
-              <p className="mt-4 text-left text-base/6 text-neutral-200">
-                Describe your idea and ship a Manim-ready animation with precise camera moves and timings.
+
+              <h3 className="text-xl font-bold text-white mb-3 leading-tight">
+                {feature.title}
+              </h3>
+              <p className="text-sm text-white/35 leading-relaxed flex-1">
+                {feature.description}
               </p>
-            </div>
-          </WobbleCard>
 
-          <WobbleCard containerClassName="col-span-1 min-h-[300px] bg-purple-900">
-            <div className="h-10 w-10 rounded-lg bg-white/10 flex items-center justify-center mb-4">
-              <Cpu className="h-5 w-5 text-white/70" />
-            </div>
-            <h2 className="max-w-80 text-left text-balance text-base md:text-xl lg:text-3xl font-semibold tracking-[-0.015em] text-white">
-              Optimized rendering
-            </h2>
-            <p className="mt-4 max-w-[26rem] text-left text-base/6 text-neutral-200">
-              GPU-friendly defaults and queued render jobs keep your workflow smooth.
-            </p>
-          </WobbleCard>
-
-          <WobbleCard containerClassName="col-span-1 min-h-[300px] bg-emerald-900">
-            <div className="h-10 w-10 rounded-lg bg-white/10 flex items-center justify-center mb-4">
-              <ShieldCheck className="h-5 w-5 text-white/70" />
-            </div>
-            <h2 className="max-w-80 text-left text-balance text-base md:text-xl lg:text-3xl font-semibold tracking-[-0.015em] text-white">
-              Team-safe access
-            </h2>
-            <p className="mt-4 max-w-[26rem] text-left text-base/6 text-neutral-200">
-              Role-aware auth, audit trails, and project-scoped secrets out of the box.
-            </p>
-          </WobbleCard>
-
-          <WobbleCard containerClassName="col-span-1 lg:col-span-2 bg-orange-900 min-h-[300px]">
-            <div className="max-w-sm">
-              <div className="h-10 w-10 rounded-lg bg-white/10 flex items-center justify-center mb-4">
-                <Wand2 className="h-5 w-5 text-white/70" />
-              </div>
-              <h2 className="max-w-sm md:max-w-lg text-left text-balance text-base md:text-xl lg:text-3xl font-semibold tracking-[-0.015em] text-white">
-                Autofix + iterate
-              </h2>
-              <p className="mt-4 max-w-[26rem] text-left text-base/6 text-neutral-200">
-                Guided repair flows catch syntax hiccups and suggest better camera paths automatically.
-              </p>
-            </div>
-          </WobbleCard>
+              {/* Mini Widget */}
+              {feature.widget}
+            </motion.div>
+          ))}
         </div>
       </div>
     </section>
-  );
+  )
 }

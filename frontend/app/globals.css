@@ -9,10 +9,10 @@
 
 /* Dark mode (default for main app) */
 :root {
-  --background: #0a0a0a;
+  --background: #000000;
   --foreground: #fafafa;
-  --border: rgba(255, 255, 255, 0.08);
-  --primary: #3b82f6;
+  --border: rgba(255, 255, 255, 0.1);
+  --primary: #ffffff;
   --primary-foreground: #0a0a0a;
   --secondary: #1a1a1a;
   --secondary-foreground: #e5e5e5;
@@ -115,16 +115,14 @@ h6 {
   letter-spacing: -0.025em;
 }
 
-/* Grid background pattern */
+/* Grid background pattern - kept subtle but set to black */
 .grid-pattern {
-  background-image: radial-gradient(circle at 1px 1px, rgba(255, 255, 255, 0.05) 1px, transparent 0);
-  background-size: 24px 24px;
+  background-color: #000000;
 }
 
-/* Glow effect */
+/* Row-based glow removed for pure black look */
 .glow-effect {
-  background: radial-gradient(circle at center, rgba(59, 130, 246, 0.15) 0%, transparent 70%);
-  filter: blur(80px);
+  display: none;
 }
 
 /* Dark card style */

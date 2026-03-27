@@ -1,0 +1,39 @@
+{
+  "family": "movinglines-task",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "1024",
+  "memory": "2048",
+  "executionRoleArn": "arn:aws:iam::252967153912:role/ecsTaskExecutionRole",
+  "containerDefinitions": [
+    {
+      "name": "redis",
+      "image": "redis:7-alpine",
+      "essential": false,
+      "portMappings": [{ "containerPort": 6379, "protocol": "tcp" }]
+    },
+    {
+      "name": "backend",
+      "image": "252967153912.dkr.ecr.ap-south-1.amazonaws.com/movinglines-backend:latest",
+      "essential": true,
+      "portMappings": [{ "containerPort": 8000, "protocol": "tcp" }],
+      "environment": [
+        { "name": "REDIS_URL", "value": "redis://127.0.0.1:6379" }
+      ],
+      "secrets": [
+        { "name": "GOOGLE_API_KEY",   "valueFrom": "arn:aws:ssm:ap-south-1:252967153912:parameter/movinglines/GOOGLE_API_KEY" },
+        { "name": "PINECONE_API_KEY", "valueFrom": "arn:aws:ssm:ap-south-1:252967153912:parameter/movinglines/PINECONE_API_KEY" },
+        { "name": "SUPABASE_URL",     "valueFrom": "arn:aws:ssm:ap-south-1:252967153912:parameter/movinglines/SUPABASE_URL" },
+        { "name": "SUPABASE_KEY",     "valueFrom": "arn:aws:ssm:ap-south-1:252967153912:parameter/movinglines/SUPABASE_KEY" }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-region": "ap-south-1",
+          "awslogs-group": "/ecs/movinglines",
+          "awslogs-stream-prefix": "backend"
+        }
+      }
+    }
+  ]
+}

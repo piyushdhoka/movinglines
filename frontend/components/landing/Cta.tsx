@@ -1,41 +1,47 @@
 'use client'
 
 import Link from 'next/link'
-import { Button } from '@/components/ui/button'
+import { ArrowRight, Sparkles } from 'lucide-react'
 
 export function Cta({ onLaunchAction }: { onLaunchAction: () => void }) {
   return (
-    <section className="w-full px-6 py-24 md:py-32 bg-black">
-      <div className="max-w-5xl mx-auto dark-card p-10 md:p-16 text-center space-y-8 relative overflow-hidden group">
-        <div className="absolute top-0 left-0 w-full h-px bg-linear-to-r from-transparent via-white/20 to-transparent" />
-
-        <div className="space-y-4 relative z-10">
-          <p className="text-[11px] font-medium tracking-[0.2em] text-blue-400 uppercase">Ready to Start?</p>
-          <h3 className="text-3xl md:text-5xl font-medium tracking-tight text-white/90">
-            Create your first scene <br className="hidden md:block" /> in under a minute.
-          </h3>
-          <p className="text-sm md:text-lg text-white/40 max-w-xl mx-auto leading-relaxed">
-            Join the new wave of technical creators using generative AI to skip the boilerplate and ship the vibe.
-          </p>
+    <section className="w-full px-6 py-20 md:py-28 bg-black">
+      <div className="max-w-4xl mx-auto text-center space-y-8">
+        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-orange-500/20 bg-orange-500/5 text-orange-400 text-[11px] font-bold uppercase tracking-widest">
+          <Sparkles className="h-3 w-3" />
+          Ready to start?
         </div>
 
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 relative z-10">
+        <h3 className="text-4xl md:text-6xl font-bold tracking-tight text-white leading-tight">
+          Create your first scene <br className="hidden md:block" />
+          <span className="text-white/30">in under a minute.</span>
+        </h3>
+
+        <p className="text-base md:text-lg text-white/30 max-w-xl mx-auto leading-relaxed">
+          Join the new wave of technical creators using generative AI to skip the boilerplate and ship the vibe.
+        </p>
+
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-2">
           <button
-            className="btn-primary h-12 px-10 text-[15px]"
+            className="group h-14 px-10 rounded-2xl bg-orange-500 text-black text-sm font-bold hover:bg-orange-400 transition-all duration-300 active:scale-95 flex items-center gap-3"
             onClick={onLaunchAction}
           >
             Launch Studio
+            <ArrowRight className="h-4 w-4 group-hover:translate-x-0.5 transition-transform" />
           </button>
           <Link
-            href="mailto:team@movinglines.app"
-            className="btn-ghost h-12 px-10 text-[15px]"
+            href="https://www.linkedin.com/in/piyushdhoka27"
+            target="_blank"
+            rel="noreferrer"
+            className="group h-14 px-10 rounded-2xl border border-white/10 text-white/50 text-sm font-bold hover:text-white hover:border-white/20 transition-all flex items-center gap-2"
           >
-            Contact Team
+            Contact Us
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform">
+              <path d="M7 7h10v10" />
+              <path d="M7 17 17 7" />
+            </svg>
           </Link>
         </div>
-
-        {/* Subtle Decorative Glow */}
-        <div className="absolute -bottom-24 -right-24 w-64 h-64 glow-effect transition-transform group-hover:scale-110 duration-700" />
       </div>
     </section>
   )

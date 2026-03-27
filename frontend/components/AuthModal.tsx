@@ -4,10 +4,8 @@ import { useState } from 'react'
 import { useAuth } from '@/components/providers/AuthProvider'
 import { useAuthModal } from '@/hooks/use-auth-modal'
 import { supabase } from '@/lib/supabase'
-import { Mail, Lock, Loader2, ArrowRight, CheckCircle2 } from 'lucide-react'
+import { Loader2, ArrowRight, CheckCircle2 } from 'lucide-react'
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog'
-import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
 import GoogleAuthLoading from '@/components/ui/GoogleAuthLoading'
 import Image from 'next/image'
 
@@ -71,43 +69,30 @@ export function AuthModal() {
     }
   }
 
-  // Loading overlay for Google redirect
   if (googleLoading) {
     return <GoogleAuthLoading />;
   }
 
-  // Email confirmation sent view
   if (confirmationSent) {
     return (
       <Dialog open={isOpen} onOpenChange={close}>
-        <DialogContent className="sm:max-w-md border border-white/10 bg-black p-0 overflow-hidden rounded-sm shadow-2xl">
+        <DialogContent className="sm:max-w-md border border-white/10 bg-[#0a0a0a] p-0 overflow-hidden rounded-2xl shadow-2xl">
           <DialogTitle className="sr-only">Email Confirmation</DialogTitle>
           <DialogDescription className="sr-only">Check your email for confirmation link</DialogDescription>
           <div className="p-8 md:p-10">
             <div className="text-center space-y-6">
-              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-white/5 border border-white/10">
-                <CheckCircle2 className="h-8 w-8 text-white/70" />
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-orange-500/10 border border-orange-500/20">
+                <CheckCircle2 className="h-8 w-8 text-orange-400" />
               </div>
               <div className="space-y-2">
-                <h2 className="text-2xl font-medium text-white/90">Check your inbox</h2>
+                <h2 className="text-2xl font-bold text-white">Check your inbox</h2>
                 <p className="text-white/40 text-sm max-w-xs mx-auto leading-relaxed">
                   We sent a confirmation link to <br /> <span className="text-white/70">{email}</span>
                 </p>
               </div>
-              <div className="bg-white/5 border border-white/5 rounded-xs p-4">
-                <p className="text-[11px] text-white/30 uppercase tracking-wider">
-                  Check your spam folder if it doesn't arrive.
-                </p>
-              </div>
               <button
-                onClick={() => {
-                  setConfirmationSent(false)
-                  setIsSignUp(false)
-                  setEmail('')
-                  setPassword('')
-                  setError('')
-                }}
-                className="btn-primary w-full h-12 text-[13px]"
+                onClick={() => { setConfirmationSent(false); setIsSignUp(false) }}
+                className="w-full h-12 bg-white text-black font-bold rounded-xl text-sm hover:bg-neutral-100 transition-all active:scale-[0.98]"
               >
                 Back to Sign In
               </button>
@@ -120,21 +105,21 @@ export function AuthModal() {
 
   return (
     <Dialog open={isOpen} onOpenChange={close}>
-      <DialogContent className="sm:max-w-md border border-white/10 bg-[#0a0a0a] p-0 overflow-hidden rounded-sm shadow-2xl animate-slide-up">
+      <DialogContent className="sm:max-w-md border border-white/10 bg-[#0a0a0a] p-0 overflow-hidden rounded-2xl shadow-2xl">
         <DialogTitle className="sr-only">{isSignUp ? 'Create account' : 'Welcome back'}</DialogTitle>
-        <DialogDescription className="sr-only">{isSignUp ? 'Start creating amazing animations' : 'Continue your creative journey'}</DialogDescription>
-        <div className="p-8 md:p-10 space-y-8">
+        <DialogDescription className="sr-only">{isSignUp ? 'Start creating' : 'Sign in'}</DialogDescription>
+        <div className="p-8 md:p-10 space-y-6">
           {/* Header */}
-          <div className="text-center space-y-4">
-            <div className="inline-flex items-center justify-center w-12 h-12 rounded-xs bg-black overflow-hidden mx-auto">
+          <div className="text-center space-y-3">
+            <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-white/5 overflow-hidden mx-auto border border-white/10">
               <Image src="/logo.png" alt="MovingLines" width={48} height={48} className="w-full h-full object-cover" />
             </div>
             <div className="space-y-1">
-              <h2 className="text-2xl font-medium text-white/90 tracking-tight">
+              <h2 className="text-xl font-bold text-white tracking-tight">
                 {isSignUp ? 'Create your account' : 'Welcome back'}
               </h2>
-              <p className="text-[12px] text-white/30 uppercase tracking-[0.2em]">
-                {isSignUp ? 'Free early access' : 'Enter your credentials'}
+              <p className="text-xs text-white/30">
+                {isSignUp ? 'Start creating stunning animations' : 'Continue your creative journey'}
               </p>
             </div>
           </div>
@@ -144,7 +129,7 @@ export function AuthModal() {
             type="button"
             onClick={handleGoogleSignIn}
             disabled={googleLoading || loading}
-            className="w-full h-12 bg-white flex items-center justify-center gap-3 transition-all hover:opacity-90 active:scale-[0.98] text-black font-medium text-[13px] rounded-xs disabled:opacity-50"
+            className="w-full h-12 bg-white flex items-center justify-center gap-3 transition-all hover:bg-neutral-100 active:scale-[0.98] text-black font-bold text-sm rounded-xl disabled:opacity-50"
           >
             <svg className="h-5 w-5" viewBox="0 0 24 24">
               <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
@@ -158,46 +143,35 @@ export function AuthModal() {
           {/* Divider */}
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-white/5" />
+              <div className="w-full border-t border-white/10" />
             </div>
             <div className="relative flex justify-center text-[10px]">
-              <span className="px-4 bg-[#0a0a0a] text-white/20 uppercase tracking-[0.2em]">
-                or email
-              </span>
+              <span className="px-3 bg-[#0a0a0a] text-white/25 uppercase tracking-widest">or</span>
             </div>
           </div>
 
           {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-3">
-              <div className="relative group">
-                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-white/20 transition-colors group-focus-within:text-white/50" />
-                <input
-                  type="email"
-                  placeholder="Email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full h-11 pl-11 bg-white/5 border border-white/10 rounded-xs text-white text-[13px] placeholder:text-white/20 transition-all focus:outline-none focus:border-white/30"
-                  required
-                />
-              </div>
-
-              <div className="relative group">
-                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-white/20 transition-colors group-focus-within:text-white/50" />
-                <input
-                  type="password"
-                  placeholder="Password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="w-full h-11 pl-11 bg-white/5 border border-white/10 rounded-xs text-white text-[13px] placeholder:text-white/20 transition-all focus:outline-none focus:border-white/30"
-                  required
-                  minLength={6}
-                />
-              </div>
-            </div>
+          <form onSubmit={handleSubmit} className="space-y-3">
+            <input
+              type="email"
+              placeholder="Email address"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full h-12 px-4 bg-white/5 border border-white/10 rounded-xl text-white text-sm placeholder:text-white/25 transition-all focus:outline-none focus:border-orange-500/50 focus:ring-1 focus:ring-orange-500/20"
+              required
+            />
+            <input
+              type="password"
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full h-12 px-4 bg-white/5 border border-white/10 rounded-xl text-white text-sm placeholder:text-white/25 transition-all focus:outline-none focus:border-orange-500/50 focus:ring-1 focus:ring-orange-500/20"
+              required
+              minLength={6}
+            />
 
             {error && (
-              <div className="text-red-400 text-[11px] font-medium p-3 bg-red-400/5 border border-red-400/10 rounded-xs">
+              <div className="text-red-400 text-xs font-medium p-3 bg-red-400/5 border border-red-400/10 rounded-xl text-center">
                 {error}
               </div>
             )}
@@ -205,31 +179,26 @@ export function AuthModal() {
             <button
               type="submit"
               disabled={loading}
-              className="btn-primary w-full h-12 text-[13px]"
+              className="w-full h-12 bg-orange-500 hover:bg-orange-400 text-black font-bold rounded-xl transition-all active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-2 text-sm"
             >
               {loading ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
+                <Loader2 className="h-5 w-5 animate-spin" />
               ) : (
-                <span className="flex items-center gap-2">
+                <>
                   {isSignUp ? 'Create Account' : 'Sign In'}
-                  <ArrowRight className="h-3.5 w-3.5" />
-                </span>
+                  <ArrowRight className="h-4 w-4" />
+                </>
               )}
             </button>
           </form>
 
           {/* Toggle */}
-          <p className="text-center text-[12px] text-white/30">
+          <p className="text-center text-xs text-white/30 pt-2">
             {isSignUp ? 'Already have an account?' : "Don't have an account?"}{' '}
             <button
               type="button"
-              onClick={() => {
-                setIsSignUp(!isSignUp)
-                setError('')
-                setEmail('')
-                setPassword('')
-              }}
-              className="text-white/70 hover:text-white font-medium underline underline-offset-4 decoration-white/20 transition-all"
+              onClick={() => { setIsSignUp(!isSignUp); setError('') }}
+              className="text-orange-400 hover:text-orange-300 font-medium transition-colors"
             >
               {isSignUp ? 'Sign in' : 'Sign up'}
             </button>
@@ -239,5 +208,3 @@ export function AuthModal() {
     </Dialog>
   )
 }
-
-

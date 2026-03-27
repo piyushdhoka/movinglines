@@ -1,4 +1,13 @@
-const API_URL = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000').replace(/\/$/, '')
+function resolveApiUrl() {
+  const raw = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000').replace(/\/$/, '')
+  // Avoid mixed-content failures when frontend is served over HTTPS.
+  if (typeof window !== 'undefined' && window.location.protocol === 'https:' && raw.startsWith('http://')) {
+    return raw.replace(/^http:\/\//, 'https://')
+  }
+  return raw
+}
+
+const API_URL = resolveApiUrl()
 
 export type Quality = 'l' | 'm' | 'h' | 'k'
 
@@ -161,6 +170,6 @@ export async function getUserStats() {
 
 
 export function getSocketURL() {
-  return process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
+  return API_URL
 }
 
