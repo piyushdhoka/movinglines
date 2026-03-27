@@ -39,7 +39,7 @@ export function Hero({ onLaunchAction }: { onLaunchAction: () => void }) {
             <span className="bg-linear-to-r from-orange-400 via-amber-400 to-orange-500 bg-clip-text text-transparent italic font-medium tracking-normal">No code required.</span>
           </h1>
           <p className="text-base md:text-xl text-white/40 max-w-lg mx-auto leading-relaxed font-medium px-4">
-            Turn complex equations into <span className="text-white/80">stunning Manim animations</span> with just a prompt. 
+            Turn complex equations into <span className="text-white/80">stunning Manim animations</span> with just a prompt.
             Stop coding, start creating.
           </p>
         </motion.div>
@@ -81,7 +81,7 @@ export function Hero({ onLaunchAction }: { onLaunchAction: () => void }) {
                   </select>
                   <div className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-orange-400/50">
                     <svg width="10" height="6" viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M1 1L5 5L9 1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                      <path d="M1 1L5 5L9 1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
                   </div>
                 </div>
@@ -89,7 +89,7 @@ export function Hero({ onLaunchAction }: { onLaunchAction: () => void }) {
                   Manim v0.18
                 </span>
               </div>
-              
+
               <button
                 type="submit"
                 className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl bg-orange-500 text-black text-sm font-bold hover:bg-orange-400 transition-all active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed shadow-lg shadow-orange-500/20"
@@ -100,7 +100,7 @@ export function Hero({ onLaunchAction }: { onLaunchAction: () => void }) {
               </button>
             </div>
           </div>
-          
+
           {/* Quick Shortcuts */}
           <div className="flex flex-wrap items-center justify-center gap-2 mt-5">
             {categories.map((cat) => (

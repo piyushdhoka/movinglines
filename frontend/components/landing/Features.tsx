@@ -114,9 +114,6 @@ export function Features() {
           {features.map((feature, index) => (
             <motion.div
               key={feature.title}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
               transition={{ delay: index * 0.1 }}
               className="group relative p-7 rounded-2xl bg-[#0f0f0f] border border-white/5 hover:border-white/10 transition-all flex flex-col"
             >
