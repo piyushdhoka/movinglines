@@ -25,8 +25,8 @@ export function Hero({ onLaunchAction }: { onLaunchAction: () => void }) {
   }
 
   return (
-    <section className="relative w-full min-h-screen flex flex-col items-center justify-center px-6 pt-28 pb-20 overflow-hidden bg-black">
-      <div className="relative z-10 w-full max-w-4xl mx-auto flex flex-col items-center text-center space-y-8">
+    <section className="relative w-full min-h-screen flex flex-col items-center justify-center px-6 pt-32 pb-20 md:pt-40 md:pb-28 overflow-hidden bg-black">
+      <div className="relative z-10 w-full max-w-5xl mx-auto flex flex-col items-center text-center space-y-10 md:space-y-12">
         {/* Main Heading */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -34,11 +34,11 @@ export function Hero({ onLaunchAction }: { onLaunchAction: () => void }) {
           transition={{ delay: 0.2 }}
           className="space-y-6"
         >
-          <h1 className="text-6xl md:text-7xl lg:text-[6.5rem] font-extrabold tracking-tight leading-[0.9] text-white">
+          <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-[6.5rem] font-extrabold tracking-tight leading-[0.9] text-white">
             Visualize Math. <br />
             <span className="bg-linear-to-r from-orange-400 via-amber-400 to-orange-500 bg-clip-text text-transparent italic font-medium tracking-normal">No code required.</span>
           </h1>
-          <p className="text-lg md:text-xl text-white/40 max-w-lg mx-auto leading-relaxed font-medium">
+          <p className="text-base md:text-xl text-white/40 max-w-lg mx-auto leading-relaxed font-medium px-4">
             Turn complex equations into <span className="text-white/80">stunning Manim animations</span> with just a prompt. 
             Stop coding, start creating.
           </p>
@@ -53,7 +53,7 @@ export function Hero({ onLaunchAction }: { onLaunchAction: () => void }) {
           className="w-full max-w-xl"
         >
           <div className="group relative rounded-2xl overflow-hidden bg-white/5 border border-white/10 transition-all duration-300 hover:border-orange-500/20 focus-within:border-orange-500/40 focus-within:shadow-[0_0_50px_rgba(249,115,22,0.1)]">
-            <div className="p-5 pb-3">
+            <div className="p-4 md:p-6 pb-2 md:pb-3">
               <textarea
                 id="hero-prompt"
                 name="prompt"
@@ -61,18 +61,18 @@ export function Hero({ onLaunchAction }: { onLaunchAction: () => void }) {
                 onChange={(e) => setPrompt(e.target.value)}
                 placeholder="Visualize the beauty of Fourier transforms..."
                 aria-label="Describe what you want to animate"
-                className="w-full bg-transparent text-white text-lg placeholder:text-white/20 outline-none resize-none h-12"
+                className="w-full bg-transparent text-white text-base md:text-lg placeholder:text-white/20 outline-none resize-none h-16 md:h-12"
                 autoComplete="off"
               />
             </div>
 
-            <div className="flex items-center justify-between px-5 py-3 border-t border-white/5 bg-white/1">
-              <div className="flex items-center gap-3">
-                <div className="relative">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-4 md:px-5 py-3 border-t border-white/5 bg-white/1">
+              <div className="flex items-center gap-3 w-full sm:w-auto overflow-x-auto no-scrollbar pb-1 sm:pb-0">
+                <div className="relative shrink-0">
                   <select
                     value={quality}
                     onChange={(e) => setQuality(e.target.value)}
-                    className="appearance-none bg-orange-500/10 border border-orange-500/20 text-orange-400 text-[10px] font-bold uppercase tracking-wider px-3 py-1.5 rounded-lg pr-8 outline-none hover:bg-orange-500/20 transition-colors cursor-pointer"
+                    className="appearance-none bg-orange-500/10 border border-orange-500/20 text-orange-400 text-[10px] font-bold uppercase tracking-widest px-3 py-2 rounded-lg pr-8 outline-none hover:bg-orange-500/20 transition-colors cursor-pointer"
                   >
                     <option value="480p">480p</option>
                     <option value="720p">720p</option>
@@ -85,14 +85,14 @@ export function Hero({ onLaunchAction }: { onLaunchAction: () => void }) {
                     </svg>
                   </div>
                 </div>
-                <span className="px-2.5 py-1.5 rounded-lg bg-white/5 border border-white/5 text-white/30 text-[10px] font-bold uppercase tracking-wider">
+                <span className="shrink-0 px-2.5 py-2 rounded-lg bg-white/5 border border-white/5 text-white/30 text-[10px] font-bold uppercase tracking-widest">
                   Manim v0.18
                 </span>
               </div>
               
               <button
                 type="submit"
-                className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-orange-500 text-black text-sm font-bold hover:bg-orange-400 transition-all active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed shadow-lg shadow-orange-500/20"
+                className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl bg-orange-500 text-black text-sm font-bold hover:bg-orange-400 transition-all active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed shadow-lg shadow-orange-500/20"
                 disabled={!prompt.trim()}
               >
                 Generate

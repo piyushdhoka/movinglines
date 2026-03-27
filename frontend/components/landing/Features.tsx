@@ -100,17 +100,17 @@ const features = [
 
 export function Features() {
   return (
-    <section id="features" className="w-full px-6 py-20 md:py-28 bg-black relative">
-      <div className="max-w-7xl mx-auto space-y-16">
+    <section id="features" className="w-full px-6 py-20 md:py-32 bg-black relative">
+      <div className="max-w-7xl mx-auto space-y-20">
         <div className="space-y-4 max-w-2xl">
           <p className="text-[11px] font-bold tracking-[0.3em] text-orange-400/60 uppercase">Capabilities</p>
-          <h2 className="text-4xl md:text-5xl font-bold tracking-tight text-white">
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-white leading-[1.1]">
             Built for precision, <br />
             <span className="text-white/30">designed for creators.</span>
           </h2>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 lg:gap-10">
           {features.map((feature, index) => (
             <motion.div
               key={feature.title}

@@ -9,7 +9,7 @@ export function Footer() {
     <footer className="border-t border-white/5 bg-black">
       <div className="w-full max-w-7xl mx-auto px-6 md:px-12">
         {/* Main Footer Content */}
-        <div className="py-16 md:py-20 grid grid-cols-1 md:grid-cols-12 gap-12 md:gap-8">
+        <div className="py-20 md:py-24 grid grid-cols-1 md:grid-cols-12 gap-12 md:gap-8">
           {/* Brand Block */}
           <div className="md:col-span-5 flex flex-col gap-6">
             <Link href="/" className="flex items-center gap-3 w-fit group">
