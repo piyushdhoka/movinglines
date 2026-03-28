@@ -32,6 +32,12 @@ export const videos = pgTable('videos', {
   generatedScript: text('generated_script'), // The Manim code generated
   errorMessage: text('error_message'), // If generation failed
 
+  // Sharing
+  isPublic: boolean('is_public').notNull().default(false), // Whether video is publicly shareable
+  shareToken: text('share_token').unique(), // Optional short token for cleaner URLs
+  viewCount: integer('view_count').notNull().default(0), // Track share link views
+  sharedAt: timestamp('shared_at'), // When sharing was first enabled
+
   // Timestamps
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
@@ -39,6 +45,7 @@ export const videos = pgTable('videos', {
   userIdIdx: index('videos_user_id_idx').on(table.userId),
   createdAtIdx: index('videos_created_at_idx').on(table.createdAt),
   statusIdx: index('videos_status_idx').on(table.status),
+  shareTokenIdx: index('videos_share_token_idx').on(table.shareToken),
 }))
 
 
@@ -78,11 +85,19 @@ export const chats = pgTable('chats', {
   id: uuid('id').primaryKey().defaultRandom(),
   userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
   title: text('title').notNull(),
+
+  // Sharing
+  isPublic: boolean('is_public').notNull().default(false), // Whether chat is publicly shareable
+  shareToken: text('share_token').unique(), // Optional short token for cleaner URLs
+  viewCount: integer('view_count').notNull().default(0), // Track share link views
+  sharedAt: timestamp('shared_at'), // When sharing was first enabled
+
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 }, (table) => ({
   userIdIdx: index('chats_user_id_idx').on(table.userId),
   createdAtIdx: index('chats_created_at_idx').on(table.createdAt),
+  shareTokenIdx: index('chats_share_token_idx').on(table.shareToken),
 }))
 
 export const tasks = pgTable('tasks', {

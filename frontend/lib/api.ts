@@ -173,3 +173,64 @@ export function getSocketURL() {
   return API_URL
 }
 
+
+// ============================================================================
+// SHARING API FUNCTIONS
+// ============================================================================
+
+export async function toggleVideoSharing(videoId: string, isPublic: boolean, token: string) {
+  try {
+    const res = await fetch(`${API_URL}/api/animations/videos/${videoId}/share`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({ isPublic })
+    })
+
+    return await handleResponse(res)
+  } catch (error) {
+    console.error('Failed to toggle video sharing:', error)
+    throw error
+  }
+}
+
+export async function toggleChatSharing(chatId: string, isPublic: boolean, token: string) {
+  try {
+    const res = await fetch(`${API_URL}/api/animations/chats/${chatId}/share`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({ isPublic })
+    })
+
+    return await handleResponse(res)
+  } catch (error) {
+    console.error('Failed to toggle chat sharing:', error)
+    throw error
+  }
+}
+
+// Public API - No authentication required
+export async function getPublicVideo(videoId: string) {
+  try {
+    const res = await fetch(`${API_URL}/api/share/video/${videoId}`)
+    return await handleResponse(res)
+  } catch (error) {
+    console.error('Failed to get public video:', error)
+    throw error
+  }
+}
+
+export async function getPublicChat(chatId: string) {
+  try {
+    const res = await fetch(`${API_URL}/api/share/chat/${chatId}`)
+    return await handleResponse(res)
+  } catch (error) {
+    console.error('Failed to get public chat:', error)
+    throw error
+  }
+}

@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-from app.routers import animations, auth
+from app.routers import animations, auth, share
 
 from fastapi.responses import JSONResponse
 from starlette.middleware.cors import CORSMiddleware
@@ -66,6 +66,7 @@ setup_animations_handlers(sio)
 
 fastapi_app.include_router(animations.router, prefix="/api/animations", tags=["animations"])
 fastapi_app.include_router(auth.router, prefix="/api/auth", tags=["auth"])
+fastapi_app.include_router(share.router, prefix="/api/share", tags=["share"])
 
 @fastapi_app.get("/")
 async def root_health():
